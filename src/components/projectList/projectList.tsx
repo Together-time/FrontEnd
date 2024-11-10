@@ -1,11 +1,11 @@
 "use client";
 
-import React from "react";
-import { useRouter } from "next/navigation";
+import React, {useState} from "react";
+import { BiCalendar } from "react-icons/bi";
 import styles from './projectList.module.css';
 
 const ProjectList: React.FC = () => {
-    const router = useRouter();
+    const [selectedProjectId, setSelectedProjectId] = useState<number | null>(null);
 
     //예시 데이터(후에 백엔드와 연동)
     const projects = [
@@ -28,8 +28,16 @@ const ProjectList: React.FC = () => {
 
     return (
         <div className={styles.projectContainer}>
+            <div className={styles.projectIcon} title="현재 참여중인 시간표">
+                <BiCalendar />
+            </div>
+
             {projects.map((project) => (
-                <div key={project.id} className={styles.projectCircle}>
+                <div key={project.id} className={`${styles.projectCircle} ${
+                    selectedProjectId === project.id ? styles.selectedProjectActive : ""
+                  }`}
+                  onClick={() => setSelectedProjectId(project.id)}
+                >
                     {project.name.charAt(0).toUpperCase()}
                 </div>
             ))}

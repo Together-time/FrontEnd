@@ -1,0 +1,25 @@
+.container {
+    display: flex;
+    width: 100vw; 
+    height: 100vh;
+}
+
+.left {
+    flex-basis: 5vw;
+}
+
+.left-container{
+    display: flex;
+    justify-content: center;
+    margin-top: 2vh;
+}
+
+.middle {
+    flex-basis: 20vw;
+    background-color: #ff0000;
+}
+
+.right {
+    flex-basis: 75vw;
+    background-color: #5900ff; 
+}
