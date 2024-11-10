@@ -3,9 +3,11 @@
 import React, {useState} from "react";
 import { BiCalendar } from "react-icons/bi";
 import styles from './projectList.module.css';
+import Popup from './projectAddPopUp';
 
 const ProjectList: React.FC = () => {
     const [selectedProjectId, setSelectedProjectId] = useState<number | null>(null);
+    const [isPopupOpen, setIsPopupOpen] = useState(false);
 
     //예시 데이터(후에 백엔드와 연동)
     const projects = [
@@ -28,6 +30,8 @@ const ProjectList: React.FC = () => {
 
     return (
         <div className={styles.projectContainer}>
+
+            {/*현재 참여 중인 프로젝트*/}
             <div className={styles.projectIcon} title="현재 참여중인 시간표">
                 <BiCalendar />
             </div>
@@ -43,9 +47,14 @@ const ProjectList: React.FC = () => {
             ))}
 
             {/*새로운 프로젝트 추가*/}
-            <div className={`${styles.addCircle} ${styles.projectCircle}`}>
+            <div className={`${styles.addCircle} ${styles.projectCircle}`} onClick={() => setIsPopupOpen(true)}>
                 +
             </div>
+
+            {/* 프로젝트 추가 팝업 */}
+            {isPopupOpen && (
+                <Popup isOpen={isPopupOpen} onClose={() => setIsPopupOpen(false)} />
+            )}
         </div>
     );
 };

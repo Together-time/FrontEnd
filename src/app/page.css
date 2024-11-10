@@ -6,20 +6,20 @@
 
 .left {
     flex-basis: 5vw;
+    background-color: #f1c097;
 }
 
 .left-container{
     display: flex;
     justify-content: center;
-    margin-top: 2vh;
 }
 
 .middle {
     flex-basis: 20vw;
-    background-color: #ff0000;
+    background-color: #ebd8ca;
 }
 
 .right {
     flex-basis: 75vw;
-    background-color: #5900ff; 
+    background-color: #f5ede8;
 }

@@ -1,6 +1,6 @@
 import React from "react";
 import ProjectList from "@/components/projectList/projectList";
-import '@/page.css';
+import '@/app/page.css';
 
 const Home: React.FC = () => {
     return (

@@ -1,0 +1,70 @@
+.addMemberPopupOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 108vh;
+    background-color: rgba(0, 0, 0, 0.5); 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.addMemberpopup {
+    position: relative;
+    transform: translate(-65%, -50%);
+    background-color: white;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    width: 40vw;
+    max-width: 90%; 
+    max-height: 80%;
+}
+
+.addMemberCloseBtn{
+    font-size: 25px;
+    font-weight: bold;
+    border: none;
+    background-color: white;
+    cursor: pointer;
+}
+
+.addMember{
+    font-size: 30px;
+    font-weight: bold;
+    text-align: center;
+}
+
+.searchMemberContainer{
+    display: flex;
+    align-items: center;
+    margin-top: 50px;
+    margin-bottom: 20px;
+}
+
+.searchMember{
+    width: 80%;
+    height: 40px;
+    border: 1px solid rgb(221, 221, 221);
+    border-radius: 10px 0 0 10px;
+    padding-left: 10px;
+}
+
+.searchMember:focus {
+    border: 2px solid rgb(180, 72, 0);
+    outline: none;  
+}
+
+.searchMemberBtn{
+    width: 20%;
+    height: 40px;
+    border-radius: 0 10px 10px 0;
+    cursor: pointer;
+    background-color: rgb(230, 192, 157);
+    color: white;
+    font-size: 17px;
+    font-weight: bold;
+    border: rgb(230, 192, 157);
+}
