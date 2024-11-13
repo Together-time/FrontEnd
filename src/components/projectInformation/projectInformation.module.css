@@ -1,0 +1,183 @@
+.informationContainer{
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    margin: 0;
+}
+
+.firstContainer{
+    flex: 0 0 10%;
+    background-color: #dd9860;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.secondContainer {
+    flex: 0 0 40%; 
+    background-color: #e7b184;
+    padding: 10px 10px;
+    position: relative;
+}
+
+.userList {
+    list-style: none;
+    margin: 0;
+    margin-top: 20px;
+    margin-left: 20px;
+    max-height: 27vh;
+    overflow-y: auto;
+    scrollbar-width: none;
+}
+  
+.userItem {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    font-size: 16px;
+    overflow: hidden;
+}
+  
+.userItem span {
+    margin-right: 8px;
+    max-width: 15vw;
+    display: inline-block; 
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
+  
+.onlineIndicator {
+    width: 10px;
+    height: 10px;
+    background-color: green;
+    border-radius: 50%;
+    display: inline-block;
+}
+  
+.thirdContainer {
+    flex: 0 0 40%; 
+    background-color: #ebd8ca; 
+    padding: 10px 10px;
+    position: relative;
+}
+
+.memberInviteBtn{
+    position: absolute;
+    font-size: 18px;
+    bottom: 15px;
+    right: 15px;
+    padding: 8px 16px;
+    color: white;
+    background-color: #db7d2f;
+    border: none;
+    border-radius: 18px;
+    cursor: pointer;
+}
+
+.memberInviteBtn:hover{
+    background-color: #b9641e;
+}
+
+.projecttags{
+    list-style: none;
+    margin: 0;
+    margin-top: 20px;
+    max-height: 25vh;
+    overflow-y: auto;
+    scrollbar-width: none;
+}
+
+.tag{
+    font-size: 16px;
+    padding: 5px 10px;
+    border-radius: 50px;
+    background-color: white;
+    border: 2px solid rgb(180, 72, 0);
+    display: inline-block;
+    margin: 5px 10px 10px 0; 
+}
+
+.tagEditBtn{
+    position: absolute;
+    font-size: 16px;
+    bottom: 15px;
+    right: 15px;
+    padding: 8px 16px;
+    color: white;
+    background-color: #db7d2f;
+    border: none;
+    border-radius: 18px;
+    cursor: pointer;
+}
+
+.tagEditBtn:hover{
+    background-color: #b9641e;
+}
+
+.forthContainer {
+    flex: 0 0 10%; 
+    background-color: #dd9860; 
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+}
+
+.iconWrapper {
+    position: relative;
+}
+
+.commentIcon{
+    width: 30px;
+    height: auto;
+    cursor: pointer;
+}
+
+.unreadBadge {
+    position: absolute;
+    top: -15px; 
+    right: -15px; 
+    background-color: red;
+    color: white; 
+    font-size: 16px;
+    font-weight: bold; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%; 
+    padding: 5px 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    transform: translateX(50%);
+}
+
+.chatContainer{
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    margin: 0;
+}
+
+.titleContainer{
+    flex: 0 0 10%;
+    background-color: #dd9860;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.closeContainer{
+    flex: 0 0 5%; 
+    padding: 10px 10px;
+    position: relative;
+}
+
+.closeChatBtn{
+    position: absolute;
+    font-size: 25px;
+    font-weight: bold;
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+    right: 15px;
+}

@@ -1,0 +1,110 @@
+.EditTagsPopupOverlay{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5); 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 500;
+}
+
+.EditTagspopup{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    padding: 50px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    width: 50vw;
+    max-width: 90%; 
+    max-height: 80%;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.EditTagsCloseBtn{
+    font-size: 25px;
+    font-weight: bold;
+    border: none;
+    background-color: white;
+    cursor: pointer;
+}
+
+.EditTagsMember{
+    position: flex;
+    text-align: center;
+}
+
+.projecttags{
+    list-style: none;
+    margin: 0;
+    margin-top: 20px;
+    max-height: 25vh;
+    overflow-y: auto;
+    scrollbar-width: none;
+}
+
+.addTag{
+    font-size: 20px;
+    margin-top: 20px;
+    border: none;
+    border-bottom: 2px solid rgb(179, 179, 179);
+    padding-bottom: 15px;
+    padding: 10px;
+}
+
+.addTag:focus{
+    border: none;
+    outline: none;
+    border-bottom: 2px solid rgb(179, 179, 179);
+}
+
+.addTagDescription{
+    font-size: 18px;
+    color: rgb(179, 179, 179);
+    margin-top: 10px;
+}
+
+.tag{
+    font-size: 16px;
+    padding: 5px 10px;
+    border-radius: 50px;
+    background-color: white;
+    border: 2px solid rgb(180, 72, 0);
+    display: inline-block;
+    margin: 5px 10px 10px 0; 
+}
+
+.removeTag{
+    margin-left: 15px;
+    color: rgb(180, 72, 0);
+    cursor: pointer;
+}
+
+.tagNotice{
+    margin-top: 20px;
+    color: rgba(43, 80, 243, 0.973);
+    margin-bottom: 50px;
+}
+
+.editCompleteBtn{
+    position: absolute;
+    font-size: 18px;
+    bottom: 20px;
+    right: 20px;
+    padding: 8px 16px;
+    color: white;
+    background-color: #db7d2f;
+    border: none;
+    border-radius: 18px;
+    cursor: pointer;
+}
+
+.editCompleteBtn:hover{
+    background-color: #b9641e;
+}
