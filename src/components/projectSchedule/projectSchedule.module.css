@@ -1,0 +1,128 @@
+.dateContainer{
+    display: flex;
+    align-items: center;
+    gap: 60px;
+    color: rgb(85, 38, 0);
+    position: relative;
+    justify-content: center;
+    top: 10vh;
+    z-index: 1000;
+}
+
+.dateGroup {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    z-index: 1000;
+}
+
+.pickerBtn{
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 25px;
+    color: rgb(85, 38, 0);
+}
+
+.dateBtn{
+    color: rgb(85, 38, 0);
+    padding: 10px 16px;
+    border-radius: 50px;
+    background-color: rgb(232, 216, 202);
+    font-weight: bold;
+    font-size: 23px;
+    border-color: rgb(85, 38, 0);
+    cursor: pointer;
+}
+
+.dateBtn:hover {
+    background-color: rgb(251, 189, 76);
+}
+
+.clockSection{
+    position: relative;
+    top: 5vh;
+}
+
+/*달력 팝업*/
+
+.calendarPopUp {
+    position: absolute;
+    z-index: 1000;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 10px;
+    width: 350px;
+    top: 18vh;
+    left: 50%;
+    transform: translate(25%, -0%);
+}
+
+.calendarHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.navButton {
+    background: none;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.monthYear {
+    font-weight: bold;
+    font-size: 16px;
+}
+
+.weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    text-align: center;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.weekday {
+    text-align: center;
+    padding: 10px;
+}
+
+.days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 5px;
+}
+
+.day {
+    text-align: center;
+    padding: 10px;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+    cursor: pointer;
+}
+
+.day:hover {
+    background-color: #f0f0f0;
+}
+
+.today {
+    background-color: rgb(251, 189, 76);
+    color: white;
+    border-radius: 50%;
+}
+
+.selectedDay{
+    background-color: rgb(251, 189, 76);
+    color: white;
+    border-radius: 50%;
+}
+
+.empty {
+    visibility: hidden;
+}
+  
