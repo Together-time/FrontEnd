@@ -13,6 +13,7 @@
     justify-content: center;
     margin-left: 10px;
     margin-bottom: 30px;
+    color: rgb(85, 38, 0);
 }
 
 .projectCircle {
@@ -31,5 +32,5 @@
 }
 
 .selectedProjectActive{
-    background-color: #e29248;
+    background-color: rgb(251, 189, 76);
 }

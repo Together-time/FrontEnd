@@ -3,7 +3,7 @@
     top: 0;
     left: 0;
     width: 100vw;
-    height: 108vh;
+    height: 110vh;
     background-color: rgba(0, 0, 0, 0.5); 
     display: flex;
     align-items: center;
@@ -12,8 +12,10 @@
 }
 
 .addMemberpopup {
-    position: relative;
-    transform: translate(-65%, -50%);
+    position: fixed;
+    top: 50%; 
+    left: 50%;
+    transform: translate(-50%, -50%); 
     background-color: white;
     padding: 30px;
     border-radius: 8px;
@@ -21,6 +23,7 @@
     width: 40vw;
     max-width: 90%; 
     max-height: 80%;
+    z-index: 1010;
 }
 
 .addMemberCloseBtn{

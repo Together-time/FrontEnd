@@ -3,11 +3,12 @@
     flex-direction: column;
     height: 100vh;
     margin: 0;
+    color: rgb(85, 38, 0);
 }
 
 .firstContainer{
     flex: 0 0 10%;
-    background-color: #dd9860;
+    background-color: rgb(232, 216, 202);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -15,7 +16,7 @@
 
 .secondContainer {
     flex: 0 0 40%; 
-    background-color: #e7b184;
+    background-color: rgb(253, 250, 243);
     padding: 10px 10px;
     position: relative;
 }
@@ -57,9 +58,10 @@
   
 .thirdContainer {
     flex: 0 0 40%; 
-    background-color: #ebd8ca; 
+    background-color: rgb(253, 250, 243); 
     padding: 10px 10px;
     position: relative;
+    border-top: 1px solid rgb(232, 216, 202);
 }
 
 .memberInviteBtn{
@@ -68,15 +70,15 @@
     bottom: 15px;
     right: 15px;
     padding: 8px 16px;
-    color: white;
-    background-color: #db7d2f;
+    color: rgb(95, 62, 2);
+    background-color: rgb(232, 216, 202);
     border: none;
     border-radius: 18px;
     cursor: pointer;
 }
 
 .memberInviteBtn:hover{
-    background-color: #b9641e;
+    background-color: rgb(251, 189, 76);
 }
 
 .projecttags{
@@ -93,7 +95,7 @@
     padding: 5px 10px;
     border-radius: 50px;
     background-color: white;
-    border: 2px solid rgb(180, 72, 0);
+    border: 2px solid rgb(85, 38, 0);
     display: inline-block;
     margin: 5px 10px 10px 0; 
 }
@@ -104,20 +106,20 @@
     bottom: 15px;
     right: 15px;
     padding: 8px 16px;
-    color: white;
-    background-color: #db7d2f;
+    color: rgb(95, 62, 2);
+    background-color: rgb(232, 216, 202);
     border: none;
     border-radius: 18px;
     cursor: pointer;
 }
 
 .tagEditBtn:hover{
-    background-color: #b9641e;
+    background-color: rgb(251, 189, 76);
 }
 
 .forthContainer {
     flex: 0 0 10%; 
-    background-color: #dd9860; 
+    background-color: rgb(232, 216, 202); 
     display: flex;
     justify-content: space-between;
     align-items: center;

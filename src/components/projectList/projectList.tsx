@@ -16,18 +16,6 @@ const ProjectList: React.FC = () => {
         {id: 3, name: '건빵 모임'},
     ];
 
-    //프로젝트 추가 팝업
-    const handleAddProject = () => {
-        //예시 팝업(후에 커스텀 팝업 생성)
-        const confirmed = window.confirm("새 프로젝트를 추가하시겠습니까?");
-
-        if (confirmed) {
-            console.log("프로젝트 추가됨");
-        } else {
-            console.log("프로젝트 추가 취소됨");
-        }
-    };
-
     return (
         <div className={styles.projectContainer}>
 
