@@ -1,6 +1,12 @@
 import React, {useState} from "react";
 import InvitePopup from '@/components/common/inviteMember';
 import styles from './projectAddPopUp.module.css';
+import axios from 'axios';
+
+interface ProjectCommand {
+    title: string;
+    tags: string[];
+}
 
 interface PopupProps {
     isOpen: boolean;
@@ -14,6 +20,8 @@ const projectAddPopUp: React.FC<PopupProps> = ({ isOpen, onClose }) => {
     const [tags, setTags] = useState<string[]>([]);
     const [isInviteMember, setIsInviteMember] = useState(false);
 
+    const jwtToken = localStorage.getItem("jwtToken");
+
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setTitle(e.target.value);
     };
@@ -22,37 +30,70 @@ const projectAddPopUp: React.FC<PopupProps> = ({ isOpen, onClose }) => {
         setTag(e.target.value);
     };
 
-    //예시 태그
+
+    // 예시 태그
     const exampleTags = [
-        {id: 1, name: '제주도'},
-        {id: 2, name: '뚜벅이'},
-        {id: 3, name: '3박4일'},
+        { id: 1, name: '제주도' },
+        { id: 2, name: '뚜벅이' },
+        { id: 3, name: '3박4일' },
     ];
 
-
     const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-        if (e.key === " " && tag.trim()) {
-            //스페이스바를 눌렀을 때 입력 태그 추가
-            //추가 후 입력 필드 초기화
+        if (e.key === ' ' && tag.trim()) {
+            // 스페이스바를 눌렀을 때 입력 태그 추가
             setTags([...tags, tag.trim()]);
-            setTag("");
+            setTag('');
         }
     };
 
-    //태그 삭제
     const removeTag = (indexToRemove: number) => {
         setTags(tags.filter((_, index) => index !== indexToRemove));
-    }
+    };
 
-    //팀원 초대
     const openInvitePopup = () => setIsInviteMember(true);
     const closeInvitePopup = () => setIsInviteMember(false);
+
+    // 생성하기 버튼 클릭 시 실행
+    const handleCreateProject = async () => {
+        if (!title.trim() || tags.length < 3) {
+            alert('제목을 입력하고 최소 3개의 태그를 추가해주세요.');
+            return;
+        }
+
+        const projectData = {
+            title,
+            tags,
+            members: [],
+        };
+
+        try {
+            const response = await axios.post(
+                `${process.env.NEXT_PUBLIC_API_URL}/api/projects`,
+                projectData,
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${jwtToken}`,
+                    },
+                }
+            );
+            if (response.status === 200) {
+                alert('프로젝트가 성공적으로 생성되었습니다.');
+                onClose(); // 팝업 닫기
+            } else {
+                alert('프로젝트 생성에 실패했습니다.');
+            }
+        } catch (error) {
+            console.error('프로젝트 생성 중 오류:', error);
+            alert('오류가 발생했습니다. 다시 시도해주세요.');
+        }
+    };
 
     return (
         <div className={styles.projectAddPopupOverlay} onClick={onClose}>
             <div className={styles.projectAddpopup} onClick={(e) => e.stopPropagation()}>
                 <button className={styles.projectAddCloseBtn} onClick={onClose}>
-                X
+                    X
                 </button>
 
                 {/* 제목 입력 */}
@@ -103,8 +144,9 @@ const projectAddPopUp: React.FC<PopupProps> = ({ isOpen, onClose }) => {
                     {/* 팀원 초대 컨테이너 */}
                     <div className={styles.inviteContainer}>
                         <h1>팀원 초대</h1>
-                        <button onClick={openInvitePopup} className={styles.addInviteBtn}>+</button>
-
+                        <button onClick={openInvitePopup} className={styles.addInviteBtn}>
+                            +
+                        </button>
 
                         {/* 팀원 초대 팝업 */}
                         {isInviteMember && (
@@ -113,7 +155,9 @@ const projectAddPopUp: React.FC<PopupProps> = ({ isOpen, onClose }) => {
                     </div>
 
                     <div className={styles.addProjectBtnContainer}>
-                        <button className={styles.addProjectBtn}>생성하기</button>
+                        <button onClick={handleCreateProject} className={styles.addProjectBtn}>
+                            생성하기
+                        </button>
                     </div>
                 </div>
             </div>
