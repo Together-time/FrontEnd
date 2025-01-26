@@ -3,6 +3,7 @@
 import React, {useState, useEffect} from "react";
 import styles from "./projectSchedule.module.css";
 import Clock from "./clockSchedule";
+import Chart from "./chartSchedule";
 import DatePicker from "react-datepicker";
 
 const ProjectSchedule: React.FC = () => {
@@ -131,7 +132,7 @@ const ProjectSchedule: React.FC = () => {
 
 
     return(
-        <div>
+        <div className={styles.container}>
       {/* 날짜 선택 영역 */}
       <div className={styles.dateContainer}>
         <button onClick={handlePrevDay} className={styles.dateBtn}>
@@ -156,6 +157,11 @@ const ProjectSchedule: React.FC = () => {
         <Clock />
       </div>
 
+      {/* 칸트 차트 */}
+      <div className={styles.chartSection}>
+        <Chart />
+      </div>
+      
       {/* 달력 팝업 */}
       {showCalendar && (
         <div className={styles.calendarPopUp}>

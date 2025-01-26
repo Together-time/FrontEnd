@@ -1,3 +1,9 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh; /* 전체 화면을 차지하도록 설정 */
+}
+
 .dateContainer{
     display: flex;
     align-items: center;
@@ -5,15 +11,15 @@
     color: rgb(85, 38, 0);
     position: relative;
     justify-content: center;
-    top: 10vh;
-    z-index: 1000;
+    top: 5vh;
+    z-index: 300;
 }
 
 .dateGroup {
     display: flex;
     align-items: center;
     gap: 10px;
-    z-index: 1000;
+    z-index: 300;
 }
 
 .pickerBtn{
@@ -39,11 +45,21 @@
     background-color: rgb(251, 189, 76);
 }
 
-.clockSection{
-    position: relative;
-    top: 5vh;
+.clockSection {
+    flex: 5; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
+.chartSection {
+    flex: 5; 
+    display: flex;
+    align-items: center;
+    justify-content: left;
+    padding-left: 20px;
+    padding-right: 20px;
+}
 /*달력 팝업*/
 
 .calendarPopUp {

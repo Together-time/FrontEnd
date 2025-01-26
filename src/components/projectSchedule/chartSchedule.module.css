@@ -1,0 +1,147 @@
+.chartWrapper {
+    width: 100%;
+    overflow-x: auto; /* 가로 스크롤 허용 */
+    padding: 10px;
+    margin-top: 15vh;
+}
+
+.buttonContainer {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 10px;
+}
+
+.toggleButton {
+    border: none;
+    background-color: transparent;
+    font-size: 24px;
+    cursor: pointer;
+    transition: transform 0.3s ease-in-out;
+    color:  rgb(85, 38, 0);
+}
+
+/*일정 추가*/
+.plusButton {
+    margin-left: auto;
+    border-radius: 50%;
+    font-size: 24px;
+    padding: 5px 13px;
+    border-color: rgb(85, 38, 0);
+    background-color: #ebd8ca;
+    cursor: pointer;
+    color: rgb(85, 38, 0);
+}
+
+.plusButton:hover {
+    background-color: rgb(251, 189, 76);
+}
+
+.chartContainer {
+    width: calc(100%-15vh);
+    overflow-x: auto;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    transition: max-height 0.3s ease-in-out, opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+    justify-content: center;
+    align-items: center;
+}
+
+/* 차트 확장될 때 */
+.expanded {
+    height: auto; 
+    max-height: calc(100vh - 75vh);
+    overflow-y: auto; 
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* 차트 숨길 때 */
+.collapsed {
+    max-height: 0;
+    opacity: 0;
+    transform: translateY(-10px);
+    overflow: hidden;
+}
+
+
+.scheduleChartContainer {
+    margin-top: 20px;
+    text-align: center;
+}
+  
+.toggleButton {
+    background: none;
+    border: none;
+    color: rgb(85, 38, 0);
+    font-size: 25px;
+    cursor: pointer;
+    transition: transform 0.2s ease-in-out;
+    z-index: 100;
+}
+  
+.toggleButton:hover {
+    transform: scale(1.1);
+}
+  
+.chart {
+    width: calc(100vw - 40px);
+    overflow-x: auto;
+    padding: 10px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+}
+
+/* 시간 축 */
+.timeLabels {
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 2px solid #ddd;
+    padding-bottom: 5px;
+    margin-bottom: 10px;
+}
+
+.timeLabel {
+    flex: 1;
+    text-align: center;
+    font-size: 12px;
+    color: #555;
+}
+
+/* 일정 막대 */
+.tasks {
+    position: relative;
+    height: 200px;
+}
+
+.task {
+    position: absolute;
+    height: 30px;
+    background-color: rgb(251, 189, 76);
+    color: white;
+    text-align: center;
+    line-height: 30px;
+    border-radius: 5px;
+    font-size: 16px;
+    font-weight: bold;
+}
+  
+.table {
+    width: 100%;
+    border-collapse: collapse;
+}
+  
+.table th,
+.table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: center;
+}
+  
+.table th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+}
+  
