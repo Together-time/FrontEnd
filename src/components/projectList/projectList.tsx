@@ -6,6 +6,9 @@ import styles from './projectList.module.css';
 import Popup from './projectAddPopUp';
 import { useAppDispatch, useAppSelector } from '@/app/store/store';
 import { fetchProjects } from '@/app/store/projectSlice';
+import type { Project } from '@/app/store/projectSlice';
+import { setSelectedProject } from '@/app/store/selectedProjectSlice';
+import { RootState } from "@/app/store/store";
 
 const ProjectList: React.FC = () => {
   const [selectedProjectId, setSelectedProjectId] = useState<number | null>(null);
@@ -14,6 +17,8 @@ const ProjectList: React.FC = () => {
 
   // Redux에서 프로젝트 데이터 가져오기
   const { projects, loading, error } = useAppSelector((state) => state.project);
+  //특정 프로젝트 데이터 불러오기
+  const selectedProject = useAppSelector((state:RootState) => state.selectedProject.selectedProject);
 
   // 프로젝트 데이터 로드
   useEffect(() => {
@@ -26,15 +31,18 @@ const ProjectList: React.FC = () => {
     dispatch(fetchProjects())
       .unwrap()
       .then(() => {
-        console.log('프로젝트 리스트 요청 성공');
       })
       .catch((err) => {
-        console.error('프로젝트 리스트 요청 실패:', err);
       });
   }, [dispatch]);
 
   if (status === "loading") return <p>Loading...</p>;
   if (error) return <p>Error: {JSON.stringify(error)}</p>; // 객체를 문자열로 변환하여 출력
+
+  //프로젝트 선택
+  const handleProjectClick = (project: Project) => {
+    dispatch(setSelectedProject(project));
+  };
 
   return (
     <div className={styles.projectContainer}>
@@ -48,10 +56,8 @@ const ProjectList: React.FC = () => {
       {!loading && !error && projects.map((project) => (
         <div
           key={project.id}
-          className={`${styles.projectCircle} ${
-            selectedProjectId === project.id ? styles.selectedProjectActive : ""
-          }`}
-          onClick={() => setSelectedProjectId(project.id)}
+          className={`${styles.projectCircle} ${selectedProject?.id === project.id ? styles.selectedProjectActive : ""}`}
+          onClick={() => handleProjectClick(project)}
         >
           {project.title?.charAt(0).toUpperCase() || "?"}
         </div>

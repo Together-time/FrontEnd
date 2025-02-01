@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import axios from 'axios';
 
-interface Project {
+export interface Project {
   id: number;
   status: string;
   tags: string[];
@@ -38,7 +38,6 @@ export const fetchProjects = createAsyncThunk<Project[], void, { rejectValue: st
           },
         });
   
-        console.log('프로젝트 데이터 응답:', response.data);
         return response.data; 
       } catch (error: any) {
         console.error('API 요청 에러:', error.response?.data || error.message); 
