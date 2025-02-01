@@ -1,9 +1,12 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import axios from 'axios';
 
-export interface Project {
-    id: number;
-    name: string;
+interface Project {
+  id: number;
+  status: string;
+  tags: string[];
+  title: string; 
+  views: number;
 }
 
 interface ProjectState{

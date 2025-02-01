@@ -33,6 +33,9 @@ const ProjectList: React.FC = () => {
       });
   }, [dispatch]);
 
+  if (status === "loading") return <p>Loading...</p>;
+  if (error) return <p>Error: {JSON.stringify(error)}</p>; // 객체를 문자열로 변환하여 출력
+
   return (
     <div className={styles.projectContainer}>
       {/* 현재 참여 중인 프로젝트 */}
@@ -50,7 +53,7 @@ const ProjectList: React.FC = () => {
           }`}
           onClick={() => setSelectedProjectId(project.id)}
         >
-          {project.name.charAt(0).toUpperCase()}
+          {project.title?.charAt(0).toUpperCase() || "?"}
         </div>
       ))}
 
