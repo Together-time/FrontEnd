@@ -5,9 +5,9 @@ import { BiCalendar } from "react-icons/bi";
 import styles from './projectList.module.css';
 import Popup from './projectAddPopUp';
 import { useAppDispatch, useAppSelector } from '@/app/store/store';
-import { fetchProjects } from '@/app/store/projectSlice';
-import type { Project } from '@/app/store/projectSlice';
+import { fetchProjects, Project } from '@/app/store/projectSlice';
 import { setSelectedProject } from '@/app/store/selectedProjectSlice';
+import { fetchProjectMembers } from "@/app/store/teamSlice";
 import { RootState } from "@/app/store/store";
 
 const ProjectList: React.FC = () => {
@@ -42,6 +42,8 @@ const ProjectList: React.FC = () => {
   //프로젝트 선택
   const handleProjectClick = (project: Project) => {
     dispatch(setSelectedProject(project));
+    dispatch(fetchProjectMembers(project.id));
+    console.log('프로젝트 상세 정보:', project);
   };
 
   return (

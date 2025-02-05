@@ -8,13 +8,19 @@ interface SelectedProjectState {
     error: string | null;
 }
 
+//참여 중인 멤버 목록
+interface Member {
+    id: number;
+    nickname: string;
+}
+
 const initialState: SelectedProjectState = {
     selectedProject: null,
     loading: false,
     error: null,
 };
 
-//특정 프로젝트 정보 가져도기
+//특정 프로젝트 정보 가져오기
 export const fetchProjectById = createAsyncThunk<Project, number, { rejectValue: string }>(
     'selectedProject/fetchProjectById',
     async ( projectId, thunkAPI ) => {

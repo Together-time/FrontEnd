@@ -2,11 +2,13 @@ import { configureStore } from '@reduxjs/toolkit';
 import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
 import projectReducer from './projectSlice';
 import selectedProjectReducer from './selectedProjectSlice';
+import teamReducer from './teamSlice';
 
 export const store = configureStore({
     reducer: {
         project: projectReducer,
         selectedProject: selectedProjectReducer,
+        team: teamReducer,
     },
 });
 

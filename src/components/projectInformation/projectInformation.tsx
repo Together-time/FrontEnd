@@ -5,6 +5,7 @@ import InvitePopup from '@/components/common/inviteMember';
 import EditTagPopup from './tagEditPopup';
 import { FaRegCommentDots } from "react-icons/fa";
 import styles from "./projectInformation.module.css";
+import { useAppSelector } from '@/app/store/store';
 
 
 const ProjectInformation: React.FC = () => {
@@ -12,45 +13,31 @@ const ProjectInformation: React.FC = () => {
     const [isEditTags, setIsEditTags] = useState(false);
     const [showChat, setShowChat] = useState(false);
 
-    //사용자 테스트 데이터(*후에 수정)
-    const users = [
-        { id: 1, name: '이사용자는이름이엄청나게깁니다많이많이길어요', isOnline: true },
-        { id: 2, name: '사용자2', isOnline: false },
-        { id: 3, name: '사용자3', isOnline: true },
-        { id: 4, name: '사용자4', isOnline: false },
-        { id: 5, name: '사용자5', isOnline: true },
-        { id: 6, name: '사용자6', isOnline: false },
-    ];
+    //프로젝트 정보 가져오기
+    const selectedProject = useAppSelector((state) => state.selectedProject.selectedProject);
+    //팀원 목록 가져오기
+    const members = useAppSelector((state) => state.team.members);
+    const loading = useAppSelector((state) => state.team.loading);
+    const error = useAppSelector((state) => state.team.error);
 
-    //접속 중인 사용자 상단에 정렬
-    const sortedUsers = [...users].sort((a, b) => Number(b.isOnline) - Number(a.isOnline));
+    // 🔹 접속 중인 사용자를 상단에 정렬하는 임시 로직 추가
+    const sortedUsers = [...members]
+    .map((user) => ({
+      ...user,
+      isOnline: Math.random() > 0.5, // ✅ 50% 확률로 온라인 상태 설정 (임시)
+    }))
+    .sort((a, b) => {
+      if (a.isOnline === b.isOnline) {
+        return a.nickname.localeCompare(b.nickname); // 같은 상태면 이름순 정렬
+      }
+      return b.isOnline ? 1 : -1; // `isOnline === true`이면 위쪽으로 배치
+    });
+  
+  
 
     //팀원 초대
     const openInvitePopup = () => setIsInviteMember(true);
     const closeInvitePopup = () => setIsInviteMember(false);
-
-    //태그 테스트 데이터(*후에 수정)
-    const tags = [
-        { id: 1, name: '경주여행' },
-        { id: 2, name: '경주여행' },
-        { id: 3, name: '경주여행' },
-        { id: 4, name: '경주여행' },
-        { id: 5, name: '경주여행' },
-        { id: 6, name: '경주여행' },
-        { id: 7, name: '경주여행' },
-        { id: 8, name: '경주여행' },
-        { id: 9, name: '경주여행' },
-        { id: 10, name: '경주여행' },
-        { id: 11, name: '경주여행' },
-        { id: 12, name: '경주여행' },
-        { id: 13, name: '경주여행' },
-        { id: 14, name: '경주여행' },
-        { id: 15, name: '경주여행' },
-        { id: 16, name: '경주여행' },
-        { id: 17, name: '경주여행' },
-        { id: 18, name: '경주여행' },
-        { id: 19, name: '경주여행' },
-    ]
 
     //태그 편집 팝업
     const openEditTagPopup = () => setIsEditTags(true);
@@ -71,17 +58,17 @@ const ProjectInformation: React.FC = () => {
                 // 기본 섹션
                 <div className={styles.informationContainer}>
                     <div className={styles.firstContainer}>
-                        <h1>대전 가요~</h1>
+                        <h1>{selectedProject ? selectedProject.title : ""}</h1>
                     </div>
                     <div className={styles.secondContainer}>
                         <h3>현재 참여 중인 인원</h3>
                         <ul className={styles.userList}>
-                            {sortedUsers.map((user) => (
-                                <li key={user.id} className={styles.userItem}>
-                                    <span>{user.name}</span>
-                                    {user.isOnline && <span className={styles.onlineIndicator}></span>}
-                                </li>
-                            ))}
+                        {sortedUsers.map((user) => (
+                            <li key={user.id} className={styles.userItem}>
+                            <span>{user.nickname}</span>
+                            {user.isOnline && <span className={styles.onlineIndicator}></span>}
+                            </li>
+                        ))}
                         </ul>
                         <button onClick={openInvitePopup} className={styles.memberInviteBtn}>
                             + 초대
@@ -93,12 +80,16 @@ const ProjectInformation: React.FC = () => {
                     <div className={styles.thirdContainer}>
                         <h3>태그</h3>
                         <ul className={styles.projecttags}>
-                            {tags.map((tag) => (
-                                <li key={tag.id} className={styles.tag}>
-                                    {tag.name}
-                                </li>
-                            ))}
-                        </ul>
+                        {selectedProject?.tags && selectedProject.tags.length > 0 ? (
+                        selectedProject.tags.map((tag, index) => (
+                            <li key={index} className={styles.tag}>
+                            {tag}
+                            </li>
+                        ))
+                        ) : (
+                        <p>태그 없음</p>
+                        )}
+                    </ul>
                         <button className={styles.tagEditBtn} onClick={openEditTagPopup}>
                             + 태그 편집
                         </button>
@@ -113,7 +104,7 @@ const ProjectInformation: React.FC = () => {
                                 {unreadMessages > 99 ? "99+" : unreadMessages}
                             </span>
                         </div>
-                        <h2>뀽☆</h2>
+                        <h2>사용자 이름</h2>
                     </div>
                 </div>
             ) : (

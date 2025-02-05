@@ -7,7 +7,14 @@ export interface Project {
   tags: string[];
   title: string; 
   views: number;
+  members?: Member[];
 }
+
+interface Member {
+  id: number;
+  nickname: string;
+}
+
 
 interface ProjectState{
     projects: Project[];
