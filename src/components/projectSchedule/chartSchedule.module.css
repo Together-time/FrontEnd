@@ -7,9 +7,8 @@
 
 .chartWrapper {
     width: 100%;
-    overflow-x: auto; 
     padding: 10px;
-    margin-top: 15vh;
+    margin-top: 13vh;
 }
 
 .buttonContainer {
@@ -102,6 +101,7 @@
 }
 
 .scheduleInput{
+    font-family: 'KyoboHand';
     font-size: 40px;
     border: none;
     border-bottom: 1px solid rgb(161, 152, 145);
@@ -116,6 +116,7 @@
 
 .chartContainer {
     width: calc(100%-15vh);
+    height: 10vh;
     overflow-x: auto;
     background-color: #f8f9fa;
     border-radius: 8px;
@@ -324,7 +325,6 @@
 .task {
     position: absolute;
     height: 30px;
-    background-color: rgb(251, 189, 76);
     color: white;
     text-align: center;
     line-height: 30px;

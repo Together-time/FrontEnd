@@ -6,33 +6,20 @@ import axios from "axios";
 import { useAppDispatch, useAppSelector } from '@/app/store/store';
 import { scheduler } from "timers/promises";
 import { RootState } from "@/app/store/store";
+import { fetchProjectSchedules } from "@/app/store/scheduleSlice";
+import { MdScheduleSend } from "react-icons/md";
 
 
 interface Task {
     id: number;
-    name: string;
-    startTime: string; // "HH:mm" 형식
-    endTime: string;   // "HH:mm" 형식
-  }
-  
-  // 예제 일정 데이터
-  const tasks: Task[] = [
-    { id: 1, name: "팀 회의", startTime: "09:00", endTime: "11:00" },
-    { id: 2, name: "개발 작업", startTime: "11:00", endTime: "13:00" },
-    { id: 3, name: "프로젝트 리뷰", startTime: "13:00", endTime: "16:00" },
-    { id: 4, name: "마무리 회의", startTime: "16:00", endTime: "17:00" },
-  ];
-  
-
-  // ⏰ 시간 변환 함수 (HH:mm → % 변환)
-  const timeToMinutes = (time: string) => {
-    const [hour, minute] = time.split(":").map(Number);
-    return hour * 60 + minute;
-  };
-
-  // 📌 가장 이른 시작 시간과 가장 늦은 종료 시간 찾기
-const earliestTime = Math.min(...tasks.map((task) => timeToMinutes(task.startTime)));
-const latestTime = Math.max(...tasks.map((task) => timeToMinutes(task.endTime)));
+    title: string;
+    memo: string;
+    startedDate: string;
+    startedTime: string;
+    endedDate: string;
+    endedTime: string;
+    color: string;
+}
 
 const ChartSchedule: React.FC = () => {
     const [isExpanded, setIsExpanded] = useState(false);
@@ -48,12 +35,63 @@ const ChartSchedule: React.FC = () => {
     // Redux에서 프로젝트 데이터 불러오기
     const selectedProject = useAppSelector((state: RootState) => state.selectedProject.selectedProject);
     const projectId = selectedProject?.id; 
+    
+    const dispatch = useAppDispatch();
 
     // 로컬 스토리지에서 선택된 날짜 가져오기
     const [selectedDate, setSelectedDate] = useState(() => {
         const storedDate = localStorage.getItem("selectedDate");
         return storedDate ? new Date(storedDate) : new Date();
     });
+
+    const schedules = useAppSelector((state: RootState) => state.schedule.schedules);
+
+    const [tasks, setTasks] = useState<Task[]>([]);
+    const [updateTrigger, setUpdateTrigger] = useState(false);
+
+    useEffect(() => {
+        if (projectId) {
+            dispatch(fetchProjectSchedules(projectId));
+        }
+    }, [dispatch, projectId, updateTrigger]);
+
+    //데이터 형식 변환
+    useEffect(() => {
+        if (schedules.length > 0) {
+            const convertedTasks: Task[] = schedules.map((schedule): Task => {
+                // ✅ 날짜 변환: "YYYY-MM-DD" 형식 문자열로 변환
+                const formatDate = (date: string | number[]): string => {
+                    if (Array.isArray(date)) {
+                        return date.map(num => num.toString().padStart(2, "0")).join("-"); 
+                    }
+                    return date; // 이미 문자열이면 그대로 반환
+                };
+    
+                // ✅ 시간 변환: '분' 단위 숫자로 변환
+                const formatTime = (time: number[] | string): string => {
+                    if (Array.isArray(time)) {
+                        return time.map(num => num.toString().padStart(2, "0")).join(":"); 
+                    }
+                    return ""; // 잘못된 값이면 기본값 0
+                };
+    
+                return {
+                    id: schedule.id,
+                    title: schedule.title,
+                    memo: schedule.memo || "",
+                    startedDate: formatDate(schedule.startedDate), 
+                    startedTime: formatTime(schedule.startedTime), 
+                    endedDate: formatDate(schedule.endedDate),
+                    endedTime: formatTime(schedule.endedTime),
+                    color: schedule.color,
+                };
+            });
+    
+            setTasks(convertedTasks);
+        }
+    }, [schedules]);
+    
+    
 
     useEffect(() => {
         const storedDate = localStorage.getItem("selectedDate");
@@ -113,6 +151,9 @@ const ChartSchedule: React.FC = () => {
                 setMemo("");
                 setSelectedStartTime("");
                 setSelectedEndTime("");
+
+                //일정 저장 후 업데이트
+                setUpdateTrigger((prev) => !prev);
             } else {
                 throw new Error("일정 저장 실패");
             }
@@ -122,6 +163,24 @@ const ChartSchedule: React.FC = () => {
         }
     };
 
+      // ⏰ 시간 변환 함수 (HH:mm → % 변환)
+    const timeToMinutes = (time: string) => {
+        const [hour, minute] = time.split(":").map(Number);
+        return hour * 60 + minute;
+    };
+
+    // 📌 가장 이른 시작 시간과 가장 늦은 종료 시간 찾기
+    const earliestTime = tasks.length > 0 ? Math.min(...tasks.map((task) => timeToMinutes(task.startedTime))) : 0;
+    const latestTime = tasks.length > 0 ? Math.max(...tasks.map((task) => timeToMinutes(task.endedTime))) : 1440;
+
+    const sortedTasks = [...tasks].sort((a, b) => timeToMinutes(a.startedTime) - timeToMinutes(b.startedTime));
+
+    // 시간 범위를 %로 변환하는 함수
+    const timeToPercentage = (time: string) => {
+        const totalDuration = latestTime - earliestTime || 1; 
+        return ((timeToMinutes(time) - earliestTime) / totalDuration) * 100;
+    };
+
     return (
         <div className={styles.chartWrapper}>
             <div className={styles.buttonContainer}>
@@ -129,6 +188,42 @@ const ChartSchedule: React.FC = () => {
                     {isExpanded ? "▼" : "▲"}
                 </button>
                 <button className={styles.plusButton} onClick={() => setIsPopupOpen(true)}>+</button>
+            </div>
+
+            {/* 애니메이션 효과가 적용된 차트 */}
+            <div className={`${styles.chartContainer} ${isExpanded ? styles.expanded : styles.collapsed}`}>
+                {/* 시간 축 */}
+                <div className={styles.timeLabels}>
+                {Array.from(
+                    { length: Math.ceil((latestTime - earliestTime) / 60) + 1 },
+                    (_, i) => {
+                    const hour = Math.floor((earliestTime + i * 60) / 60);
+                    return `${hour.toString().padStart(2, "0")}:00`;
+                    }
+                ).map((time, index) => (
+                    <div key={index} className={styles.timeLabel}>
+                    {time}
+                    </div>
+                ))}
+                </div>
+
+                {/* 일정 막대 (그래프 스타일) */}
+                <div className={styles.tasks}>
+                {sortedTasks.map((task, index) => (
+                    <div
+                    key={task.id}
+                    className={styles.task}
+                    style={{
+                        left: `${timeToPercentage(task.startedTime)}%`,
+                        width: `${timeToPercentage(task.endedTime) - timeToPercentage(task.startedTime)}%`,
+                        top: `${index * 40}px`,
+                        backgroundColor: task.color,
+                    }}
+                    >
+                    {task.title}
+                    </div>
+                ))}
+                </div>
             </div>
             {isPopupOpen && (
                 <div className={styles.scheduleOverlay} onClick={() => setIsPopupOpen(false)}>

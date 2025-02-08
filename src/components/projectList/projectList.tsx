@@ -9,6 +9,7 @@ import { fetchProjects, Project } from '@/app/store/projectSlice';
 import { setSelectedProject } from '@/app/store/selectedProjectSlice';
 import { fetchProjectMembers } from "@/app/store/teamSlice";
 import { RootState } from "@/app/store/store";
+import { fetchProjectSchedules } from "@/app/store/scheduleSlice";
 
 const ProjectList: React.FC = () => {
   const [selectedProjectId, setSelectedProjectId] = useState<number | null>(null);
