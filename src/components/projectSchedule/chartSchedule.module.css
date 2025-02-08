@@ -1,6 +1,13 @@
+@font-face {
+    font-family: 'KyoboHand';
+    src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_20-04@1.0/KyoboHand.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
 .chartWrapper {
     width: 100%;
-    overflow-x: auto; /* 가로 스크롤 허용 */
+    overflow-x: auto; 
     padding: 10px;
     margin-top: 15vh;
 }
@@ -31,10 +38,80 @@
     background-color: #ebd8ca;
     cursor: pointer;
     color: rgb(85, 38, 0);
+    transition: transform 0.2s ease-in-out;
 }
 
 .plusButton:hover {
     background-color: rgb(251, 189, 76);
+    color: white;
+    transform: scale(1.05);
+}
+
+.scheduleOverlay{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.scheduleContent{
+    position: relative;
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    width: 40vw;
+    height: auto;
+    max-height: 90vh;
+    text-align: center;
+}
+
+.scheduleHeader {
+    display: flex;
+    justify-content: flex-start; 
+    align-items: center; 
+    width: 100%;
+}
+
+.schedulecancel {
+    font-size: 18px;
+    border: none;
+    background: transparent;
+    font-weight: bold;
+    color: rgb(180, 16, 16);
+    cursor: pointer;
+    transition: transform 0.2s ease-in-out;
+    margin-left: 10px; 
+    margin-top: 10px;
+}
+
+
+.schedulecancel:hover{
+    transform: scale(1.2);
+}
+
+.schedulePlus{
+    position: relative;
+    text-align: left;
+    padding-left: 20px;
+}
+
+.scheduleInput{
+    font-size: 40px;
+    border: none;
+    border-bottom: 1px solid rgb(161, 152, 145);
+    color: rgb(85, 38, 0);
+    outline: none;
+    margin-top: 20px;
+}
+
+.scheduleInput::placeholder{
+    color: rgb(161, 152, 145);
 }
 
 .chartContainer {
@@ -46,6 +123,134 @@
     transition: max-height 0.3s ease-in-out, opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
     justify-content: center;
     align-items: center;
+}
+
+/* 시간 선택 영역 */
+.scheduleTime{
+    padding: 10px 10px 10px 10px;
+    border-bottom: 1px solid rgb(161, 152, 145);
+    margin-top: 20px;
+}
+
+.timeContainer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.rightAlign {
+    display: flex;
+    align-items: center;
+    gap: 10px; 
+}
+
+.timeContainer h2 {
+    margin-bottom: 5px;
+}
+
+.timeInput {
+    font-family: 'KyoboHand';
+    color: rgb(85, 38, 0);
+    width: 55%;
+    padding: 8px;
+    border: none;
+    border-radius: 4px;
+    font-size: 18px;
+    font-weight: bold;
+    outline: none;
+}
+
+/*색상 선택*/
+.scheduleColor{
+    display: flex;
+    margin-top: 10px;
+    gap: 10px; 
+    padding: 10px 10px 20px 10px;
+    border-bottom: 1px solid rgb(161, 152, 145);
+    cursor: pointer;
+}
+
+.scheduleColor h1{
+    font-size: 30px;
+    margin-left: 10px;
+}
+
+.colorCircle {
+    width: 24px; 
+    height: 24px;
+    border-radius: 50%; 
+    border: none; 
+    margin-top: 5px;
+    cursor: pointer;
+}
+
+.colorPickerContainer {
+    display: flex;
+    flex-wrap: wrap;
+    width: 97%;
+    height: auto;
+    gap: 50px;
+    padding: 40px;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    position: absolute;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    z-index: 100;
+}
+
+.colorOption {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: border 0.2s ease-in-out;
+}
+
+.colorOption:hover {
+    border: 2px solid black;
+}
+
+/*메모*/
+.scheduleMemo{
+    margin-top: 20px;
+}
+
+.memoArea{
+    width: 100%;
+    height: 100px;
+    margin-top: 5px;
+    resize: none;
+    color: rgb(85, 38, 0);
+    font-family: 'KyoboHand';
+    font-size: 18px;
+    border: 1px solid rgb(161, 152, 145);
+    border-radius: 5px;
+    outline: none;
+}
+
+/* 스케쥴 저장 */
+.buttonContainer {
+    display: flex;
+    justify-content: flex-end; 
+    width: 100%; 
+}
+
+.scheduleSave{
+    padding: 5px 20px;
+    font-size: 20px;
+    border-radius: 8px;
+    background-color: rgb(250, 212, 142);
+    color: rgb(85, 38, 0);
+    border-color: rgb(250, 212, 142);
+    cursor: pointer;
+}
+
+.scheduleSave:hover{
+    background-color: rgb(251, 189, 76);
+    border-color: rgb(85, 38, 0);
 }
 
 /* 차트 확장될 때 */

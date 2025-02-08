@@ -5,6 +5,7 @@ import styles from "./projectSchedule.module.css";
 import Clock from "./clockSchedule";
 import Chart from "./chartSchedule";
 import DatePicker from "react-datepicker";
+import { newDate } from "react-datepicker/dist/date_utils";
 
 const ProjectSchedule: React.FC = () => {
     const [currentDate, setCurrentDate] = useState("");
@@ -29,20 +30,42 @@ const ProjectSchedule: React.FC = () => {
         return `${year}.${month}.${day}`;
     };
 
+    //스토리지 저장 형식
+    const formatStorageDate = (date:Date): string => {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, "0"); 
+      const day = String(date.getDate()).padStart(2, "0");
+      return `${year}-${month}-${day}`; 
+    };
+
     // 초기 날짜 설정
     useEffect(() => {
+      const storedDate = localStorage.getItem("selectedDate");
+    
+      if (storedDate) {
+        setSelectedDate(new Date(storedDate));
+        setCurrentDate(formatDate(new Date(storedDate)));
+      } else {
         const today = new Date();
-        setCurrentDate(formatDate(today));
+        const formattedStorageDate = formatStorageDate(today);
+        localStorage.setItem("selectedDate", formattedStorageDate);
+    
         setSelectedDate(today);
+        setCurrentDate(formatDate(today));
+      }
     }, []);
 
     // 날짜 선택 시 호출
     const handleDateSelect = (date: Date) => {
-        setSelectedDate(date);
-        setSelectedYear(date.getFullYear()); 
-        setSelectedMonth(date.getMonth() + 1); 
-        setCurrentDate(formatDate(date));
-        setShowCalendar(false);
+      const formattedStorageDate = formatStorageDate(date);
+    
+      setSelectedDate(date);
+      setSelectedYear(date.getFullYear());
+      setSelectedMonth(date.getMonth() + 1);
+      setCurrentDate(formatDate(date));
+      setShowCalendar(false);
+    
+      localStorage.setItem("selectedDate", formattedStorageDate);
     };
 
     //하루 전으로 이동

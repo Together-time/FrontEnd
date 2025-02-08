@@ -99,6 +99,9 @@ const ClockSchedule = () => {
                     </div>
                 </div>
             </div>
+            <div>
+                <button className={styles.textScheduleButton}>&lt;</button>
+            </div>
         </div>
         );
     };

@@ -12,8 +12,18 @@ import "@/app/page.css";
 const Home: React.FC = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false); // 로그인 상태
   const [isCheckingLogin, setIsCheckingLogin] = useState(true); // 로그인 상태 확인 중 여부
+  //사용자 정보
+  const [user, setUser] = useState<{ nickname: string; email: string; online: boolean } | null>(null);
   const router = useRouter();
 
+  interface KakaoUser {
+    nickname: string;
+    email: string;
+    jwtToken: string;
+    online: boolean;
+  }
+
+  
   // 환경 변수
   const API_URL = process.env.NEXT_PUBLIC_API_URL;
   const REDIRECT_URI = process.env.NEXT_PUBLIC_KAKAO_REDIRECT_URI;
@@ -33,6 +43,34 @@ const Home: React.FC = () => {
       localStorage.setItem("jwtToken", jwtToken); // JWT 토큰 저장
 
       setIsLoggedIn(true);
+
+      // ✅ 사용자 정보 요청
+      fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/user`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${jwtToken}`,
+        },
+      })
+        .then((response) => {
+          const contentType = response.headers.get("content-type");
+          if (contentType && contentType.includes("application/json")) {
+            return response.json(); // ✅ JSON 응답
+          } else {
+            return response.text(); // ❌ 일반 텍스트 응답
+          }
+        })
+        .then((data) => {
+          if (typeof data === "string") {
+            // ❌ 일반 텍스트 응답 처리
+            console.warn("⚠ 예상치 못한 응답 형식:", data);
+            localStorage.setItem("userInfo", JSON.stringify({ email: data }));
+          } else {
+            // ✅ JSON 응답 처리
+            console.log("✅ 사용자 정보:", data);
+            localStorage.setItem("userInfo", JSON.stringify(data)); // 로컬스토리지 저장
+          }
+        })
+        .catch((error) => console.error("❌ 사용자 정보 요청 실패:", error));
 
       // URL에서 토큰 제거
       window.history.replaceState({}, document.title, window.location.pathname);
