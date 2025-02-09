@@ -120,11 +120,18 @@
     border-color: rgb(85, 38, 0);
     background-color: #ebd8ca;
     cursor: pointer;
+    z-index: 10;
+    transition: right 0.3s ease-in-out; 
 }
 
 .textScheduleButton:hover{
     background-color: rgb(251, 189, 76);
 }
+
+.textScheduleButton.moveLeft {
+    right: 14vw; /* ✅ 왼쪽으로 이동하는 거리 */
+}
+
 
 /*시계형 스케쥴러*/
 
@@ -172,4 +179,67 @@
 
     text-overflow: none;
     transform-origin: center;
+}
+
+/*텍스트형 스케쥴러*/
+.textPanel {
+    position: fixed;
+    right: -300vw; 
+    top: 15%;
+    width: 17vw;  
+    height: 63vh;
+    background: rgb(248, 247, 245);
+    box-shadow: -2px 0 5px rgba(0, 0, 0, 0.2);
+    transition: right 0.3s ease-in-out; 
+    padding: 20px;
+    overflow-y: auto;
+}
+
+/* 패널이 열릴 때 적용되는 클래스 */
+.textPanel.open {
+    right: 0;
+}
+
+/* 일정 항목 스타일 (가로 정렬) */
+.scheduleItem {
+    display: flex;
+    align-items: center;
+    justify-content: space-between; 
+    background: white;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+    white-space: nowrap; 
+}
+
+.scheduleItem:first-child {
+    margin-top: 5vh;
+}
+
+/* 색상 점 (●) */
+.textScheduleColor {
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    margin-right: 10px;
+    flex-shrink: 0; 
+    align-self: flex-start;
+    margin-top: 7px;
+}
+
+/* 일정 정보 컨테이너 */
+.textScheduleContent {
+    flex-grow: 1; 
+}
+
+/* 옵션 버튼 (⋮) */
+.optionsButton {
+    background: none;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+    color: black;
+    padding: 5px;
+    flex-shrink: 0; 
 }

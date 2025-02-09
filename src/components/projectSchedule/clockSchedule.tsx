@@ -14,6 +14,7 @@ const ClockSchedule = () => {
     const [timeAngle, setTimeAngle] = useState(0); // 시침 각도
     const [minuteAngle, setMinuteAngle] = useState(0);
     const [isAM, setIsAM] = useState(true);
+    const [isOpen, setIsOpen] = useState(false);
 
     // Redux에서 프로젝트 데이터 불러오기
     const selectedProject = useAppSelector((state: RootState) => state.selectedProject.selectedProject);
@@ -102,6 +103,18 @@ const ClockSchedule = () => {
         return `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`;
     };
 
+    const formatTime = (timeArray: any) => {
+        if (!Array.isArray(timeArray) || timeArray.length !== 2) return "";
+        const [hour, minute] = timeArray;
+        return `${hour.toString().padStart(2, "0")}:${minute.toString().padStart(2, "0")}`;
+    };
+
+    const sortedSchedules = [...schedules].sort((a, b) => {
+        const aStart = Number(a.startedTime[0]) * 60 + Number(a.startedTime[1]); 
+        const bStart = Number(b.startedTime[0]) * 60 + Number(b.startedTime[1]); 
+        return aStart - bStart;
+    });
+
     //오전/오후 필터링
     const filteredSchedules = schedules.filter(schedule => {
         const startHour = Array.isArray(schedule.startedTime) ? schedule.startedTime[0] : parseInt(schedule.startedTime.split(":")[0], 10);
@@ -117,6 +130,13 @@ const ClockSchedule = () => {
     //am, pm 표시
     const handleClick = () => {
         setIsAM((prev) => !prev);
+    };
+
+    const togglePanel = () => {
+        setIsOpen((prev) => {
+            console.log("패널 상태 변경:", !prev);
+            return !prev;
+        });
     };
 
     return (
@@ -186,8 +206,30 @@ const ClockSchedule = () => {
                     </div>
                 </div>
             </div>
-            <div>
-                <button className={styles.textScheduleButton}>&lt;</button>
+            <div className={styles.textScheduleContainer}>
+                <button className={`${styles.textScheduleButton} ${isOpen ? styles.moveLeft : ""}`} onClick={() => setIsOpen(!isOpen)}>
+                    {isOpen ? ">" : "<"}
+                </button>
+            </div>
+
+            {/* 텍스트형 일정표) */}
+            <div className={`${styles.textPanel} ${isOpen ? styles.open : ""}`}>
+                {schedules.length === 0 ? (
+                    <p className={styles.noSchedules}>일정이 없습니다.</p>
+                ) : (
+                    sortedSchedules.map((schedule) => (
+                        <div key={schedule.id} className={styles.scheduleItem}>
+                            <span className={styles.textScheduleColor} style={{ backgroundColor: schedule.color }}></span>
+                            <div className={styles.textScheduleContent}>
+                                <p className={styles.textScheduleTitle}>{schedule.title}</p>
+                                <p className={styles.textScheduleTime}>
+                                    {formatTime(schedule.startedTime)} ~ {formatTime(schedule.endedTime)}
+                                </p>
+                            </div>
+                            <button className={styles.optionsButton}>⋮</button>
+                        </div>
+                    ))
+                )}
             </div>
         </div>
         );
