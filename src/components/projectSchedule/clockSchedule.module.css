@@ -125,3 +125,51 @@
 .textScheduleButton:hover{
     background-color: rgb(251, 189, 76);
 }
+
+/*시계형 스케쥴러*/
+
+.scheduleArc {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: conic-gradient(
+        var(--color) 0deg, 
+        var(--color) var(--duration-angle),
+        transparent var(--duration-angle)
+    );
+    transform: rotate(calc(var(--start-angle) - 0deg));
+    mix-blend-mode: multiply; 
+    opacity: 0.85;
+    z-index: 0;
+}
+
+
+/* ✅ 텍스트가 일정의 중앙에 배치되도록 설정 */
+.scheduleTextContainer {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    transform: rotate(calc(var(--text-angle) - 90deg)) translate(var(--radius)) rotate(calc(-1 * var(--text-angle) + 90deg));
+    transform-origin: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+}
+
+.scheduleTitle {
+    position: absolute;
+    font-size: 20px;
+    color: white;
+    text-align: center;
+    padding: 4px 8px;
+    border-radius: 5px;
+    white-space: nowrap;
+    mix-blend-mode: normal;
+    z-index: 20;
+    pointer-events: none;
+
+    text-overflow: none;
+    transform-origin: center;
+}

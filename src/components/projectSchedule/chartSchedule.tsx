@@ -4,10 +4,8 @@ import React, { useEffect, useState } from "react";
 import styles from "./chartSchedule.module.css";
 import axios from "axios";
 import { useAppDispatch, useAppSelector } from '@/app/store/store';
-import { scheduler } from "timers/promises";
 import { RootState } from "@/app/store/store";
 import { fetchProjectSchedules } from "@/app/store/scheduleSlice";
-import { MdScheduleSend } from "react-icons/md";
 
 
 interface Task {

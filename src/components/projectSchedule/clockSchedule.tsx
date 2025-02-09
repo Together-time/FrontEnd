@@ -2,6 +2,9 @@
 
 import React, { useState, useEffect } from "react";
 import styles from "./clockSchedule.module.css";
+import { useAppDispatch, useAppSelector } from '@/app/store/store';
+import { fetchProjectSchedules } from "@/app/store/scheduleSlice";
+import { RootState } from "@/app/store/store";
 
 const ClockSchedule = () => {
     const [currentTime, setCurrentTime] = useState<{ period: string; time: string }>({
@@ -11,6 +14,21 @@ const ClockSchedule = () => {
     const [timeAngle, setTimeAngle] = useState(0); // 시침 각도
     const [minuteAngle, setMinuteAngle] = useState(0);
     const [isAM, setIsAM] = useState(true);
+
+    // Redux에서 프로젝트 데이터 불러오기
+    const selectedProject = useAppSelector((state: RootState) => state.selectedProject.selectedProject);
+    const projectId = selectedProject?.id; 
+    const schedules = useAppSelector((state: RootState) => state.schedule.schedules);
+    
+    const dispatch = useAppDispatch();
+
+    //스케쥴 정보 가져오기
+    useEffect(() => {
+        if (projectId) {
+            dispatch(fetchProjectSchedules(projectId));
+        }
+    }, [dispatch, projectId]);
+    
 
     //현재 시간
     useEffect(() => {
@@ -48,14 +66,48 @@ const ClockSchedule = () => {
         return () => clearInterval(interval); 
     }, []);
 
+    //시계침 각도 변환
+    const timeToDegrees = (time: string | number[]): number => {
+        let hour, minute;
 
-    // 테스트 데이터(*백엔드 연동 후 삭제)
-    const schedule = [
-      { time: "09:00", task: "회의", color: "#FF0000" },
-      { time: "13:00", task: "점심", color: "#00FF00" },
-      { time: "15:30", task: "운동", color: "#0000FF" },
-    ];
-  
+        if (Array.isArray(time)) {
+            [hour, minute] = time;
+        } else if (typeof time === "string") {
+            [hour, minute] = time.split(":").map(Number);
+        } else {
+            return 0;
+        }
+
+        // 12시간제 변환
+        const hourIn12 = hour % 12 || 12; // 0시는 12시로 변환
+        const degrees = hourIn12 * 30 + minute * 0.5; // 1시간 = 30도, 1분 = 0.5도
+
+        return degrees;
+    };
+
+
+    
+    // 숫자(분) 또는 배열 → "HH:mm" 문자열 변환
+    const timeToString = (time: number | string | number[]): string => {
+        if (Array.isArray(time)) {
+            // 배열 형태 ([HH, MM])인 경우 변환
+            return `${time[0].toString().padStart(2, "0")}:${time[1].toString().padStart(2, "0")}`;
+        }
+        if (typeof time === "string") {
+            return time;
+        }
+        // 숫자(분)인 경우 변환
+        const hours = Math.floor(time / 60);
+        const minutes = time % 60;
+        return `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`;
+    };
+
+    //오전/오후 필터링
+    const filteredSchedules = schedules.filter(schedule => {
+        const startHour = Array.isArray(schedule.startedTime) ? schedule.startedTime[0] : parseInt(schedule.startedTime.split(":")[0], 10);
+        return isAM ? startHour < 12 : startHour >= 12;
+    });
+
     // 시계의 시간을 위한 배열 (1부터 12까지)
     const hours = [12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
 
@@ -84,11 +136,46 @@ const ClockSchedule = () => {
                     {hour}</span>
                 </div>
                 ))}
+                {/* 일정 표시 */}
+                {filteredSchedules.map((schedule) => {
+                    const startAngle = timeToDegrees(schedule.startedTime);
+                    const endAngle = timeToDegrees(schedule.endedTime);
+                    const durationAngle = (endAngle - startAngle + 360) % 360;
+                    const textAngle = startAngle + durationAngle / 2; 
+
+                    // 🔥 180도를 넘으면 좌우 반전
+                    const flipText = textAngle > 270 || textAngle < 90 ? 0 : 180; 
+
+                    return (
+                        <>
+                            <div key={schedule.id} className={styles.scheduleArc} 
+                                style={{
+                                    "--start-angle": `${startAngle}deg`,
+                                    "--duration-angle": `${durationAngle}deg`,
+                                    "--color": schedule.color,
+                                } as React.CSSProperties}>
+                            </div>
+                            <div key={`${schedule.id}-text`} className={styles.scheduleTextContainer} 
+                                style={{ 
+                                    "--start-angle": `${startAngle}deg`,
+                                    "--duration-angle": `${durationAngle}deg`,
+                                    "--text-angle": `${textAngle}deg`,
+                                    "--radius": "32%",
+                                } as React.CSSProperties}>
+                
+                                <h2 className={styles.scheduleTitle}style={{
+                                    transform: `rotate(calc(var(--text-angle) - 90deg)) rotate(${flipText}deg)`, // ✅ JSX에서 scaleX() 직접 적용
+                                    transformOrigin: "center"
+                                }}>{schedule.title}</h2>
+                            </div>
+                        </>
+                    );
+                })}
+
                 {/* 현재 시간 표시 */}
                 <div className={`${styles.currentTimeContainer} ${isAM ? styles.amContainer : styles.pmContainer}`}>
                     <span className={styles.period}>{currentTime.period}</span>
                     <span className={styles.time}>{currentTime.time}</span>
-                    <span className={styles.day}>목 21</span>
                 </div>
                 <div className={`${styles.button} ${isAM ? styles.amBtn : styles.pmBtn}`}>
                     <div
