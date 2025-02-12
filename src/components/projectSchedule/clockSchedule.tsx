@@ -164,7 +164,7 @@ const ClockSchedule = () => {
                     const textAngle = startAngle + durationAngle / 2; 
 
                     // 🔥 180도를 넘으면 좌우 반전
-                    const flipText = textAngle > 270 || textAngle < 90 ? 0 : 180; 
+                    const flipText = textAngle > 360 || textAngle < 90 ? 0 : 180; 
 
                     return (
                         <>
