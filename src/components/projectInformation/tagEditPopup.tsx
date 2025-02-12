@@ -1,5 +1,9 @@
-import React, {useState} from "react";
+import React, {useState,useEffect} from "react";
 import styles from './tagEditPopup.module.css';
+import axios from "axios";
+import { useAppDispatch, useAppSelector } from '@/app/store/store';
+import { fetchProjectById } from '@/app/store/selectedProjectSlice';
+import { RootState } from "@/app/store/store";
 
 interface PopupProps {
     isOpen: boolean;
@@ -8,31 +12,23 @@ interface PopupProps {
 
 const TagEditPopup: React.FC<PopupProps> = ({ isOpen, onClose }) => {
     if (!isOpen) return null;
-    const [tag, setTag] = useState("")
+    const dispatch = useAppDispatch();
+
+    // Redux에서 선택된 프로젝트 가져오기
+    const selectedProject = useAppSelector((state: RootState) => state.selectedProject.selectedProject);
+    const projectId = selectedProject?.id;
+
+    // 태그 입력 상태 (입력 중인 단일 태그)
+    const [tag, setTag] = useState("");
+
+    // 태그 리스트 상태 (Redux에서 가져온 데이터를 useState로 관리)
     const [tags, setTags] = useState<string[]>([]);
 
-    //태그 테스트 데이터(*후에 수정)
-    const [exampleTags, setExampleTags] = useState([
-        { id: 1, name: '경주여행' },
-        { id: 2, name: '경주여행' },
-        { id: 3, name: '경주여행' },
-        { id: 4, name: '경주여행' },
-        { id: 5, name: '경주여행' },
-        { id: 6, name: '경주여행' },
-        { id: 7, name: '경주여행' },
-        { id: 8, name: '경주여행' },
-        { id: 9, name: '경주여행' },
-        { id: 10, name: '경주여행' },
-        { id: 11, name: '경주여행' },
-        { id: 12, name: '경주여행' },
-        { id: 13, name: '경주여행' },
-        { id: 14, name: '경주여행' },
-        { id: 15, name: '경주여행' },
-        { id: 16, name: '경주여행' },
-        { id: 17, name: '경주여행' },
-        { id: 18, name: '경주여행' },
-        { id: 19, name: '경주여행' },
-    ]);
+        useEffect(() => {
+        if (selectedProject?.tags) {
+            setTags([...selectedProject.tags]); // Redux 데이터를 복사하여 상태 관리
+        }
+    }, [selectedProject]);
 
     const handleTagChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setTag(e.target.value);
@@ -40,24 +36,55 @@ const TagEditPopup: React.FC<PopupProps> = ({ isOpen, onClose }) => {
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === " " && tag.trim()) {
-            //스페이스바를 눌렀을 때 입력 태그 추가
-            const newTag = {
-                id: exampleTags.length + 1, // 새로운 id
-                name: tag.trim(), // 입력된 태그 이름
-            };
+            if (!tags.some(existingTag => existingTag === tag.trim())) {
+                setTags([...tags, tag.trim()]);
+            }
     
-            // 기존 태그에 추가
-            setExampleTags([...exampleTags, newTag]);
-    
-            //추가 후 입력 필드 초기화
             setTag("");
         }
     };
-
-    //태그 삭제
+    
+    // 태그 삭제 함수
     const removeTag = (indexToRemove: number) => {
-        setExampleTags(exampleTags.filter((_, id) => id !== indexToRemove));
-    }
+        setTags(tags.filter((_, index) => index !== indexToRemove));
+    };
+
+    //태그 수정 버튼
+    const handleSaveTags = async () => {
+        if (!selectedProject) return;
+    
+        const token = localStorage.getItem('jwtToken');
+    
+        try {
+            const response = await axios.put(
+                `${process.env.NEXT_PUBLIC_API_URL}/api/projects/${selectedProject.id}/tag`,
+                tags ,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        "Content-Type": "application/json",
+                    },
+                    withCredentials: true 
+                }
+            );
+    
+            if (response.status === 200) {
+                alert("태그가 성공적으로 수정되었습니다!");
+                //프로젝트 데이터 재발행
+                dispatch(fetchProjectById(selectedProject.id));
+                onClose();
+            } else {
+                alert("태그 수정에 실패했습니다.");
+            }
+        } catch (error) {
+            console.error("태그 수정 오류:", error);
+            alert("서버 오류가 발생했습니다.");
+        }
+    };
+    
+    
+    
+    
 
     return(
         <div className={styles.EditTagsPopupOverlay} onClick={onClose}>
@@ -75,18 +102,19 @@ const TagEditPopup: React.FC<PopupProps> = ({ isOpen, onClose }) => {
                     className={styles.addTag}
                 />
                 <h3 className={styles.addTagDescription}>스페이스바로 태그 구분</h3>
+                {/* 태그 리스트 */}
                 <ul className={styles.projecttags}>
-                    {exampleTags.map((tag, id) => (
-                        <li key={tag.id} className={styles.tag}>
-                            {tag.name}
-                            <span onClick={() => removeTag(id)} className={styles.removeTag}>
+                    {tags.map((tag, index) => (
+                        <li key={index} className={styles.tag}>
+                            {tag}
+                            <span onClick={() => removeTag(index)} className={styles.removeTag}>
                                 &times;
                             </span>
                         </li>
                     ))}
                 </ul>
                 <p className={styles.tagNotice}>태그는 최소한 3개 이상 설정해주세요.</p>
-                <button className={styles.editCompleteBtn}>완료</button>
+                <button className={styles.editCompleteBtn} onClick={handleSaveTags}>완료</button>
             </div>
         </div>
     );
