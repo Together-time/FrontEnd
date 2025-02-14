@@ -4,6 +4,12 @@ import React, {useState, useEffect} from "react";
 import styles from "./projectSchedule.module.css";
 import Clock from "./clockSchedule";
 import Chart from "./chartSchedule";
+import { FiSearch } from "react-icons/fi";
+import { SlOptions } from "react-icons/sl";
+import { RootState } from "@/app/store/store";
+import { useAppDispatch, useAppSelector } from '@/app/store/store';
+import axios from "axios";
+import { fetchProjectById } from '@/app/store/selectedProjectSlice';
 import DatePicker from "react-datepicker";
 import { newDate } from "react-datepicker/dist/date_utils";
 
@@ -13,6 +19,20 @@ const ProjectSchedule: React.FC = () => {
     const [showCalendar, setShowCalendar] = useState(false);
     const [selectedYear, setSelectedYear] = useState<number>(new Date().getFullYear());
     const [selectedMonth, setSelectedMonth] = useState<number>(new Date().getMonth() + 1);
+    const [isOpen, setIsOpen] = useState(false);
+    const dispatch = useAppDispatch();
+
+    // Redux에서 프로젝트 데이터 가져오기
+    const { projects, loading, error } = useAppSelector((state) => state.project);
+    //특정 프로젝트 데이터 불러오기
+    const selectedProject = useAppSelector((state:RootState) => state.selectedProject.selectedProject);
+    const [isPublic, setIsPublic] = useState(selectedProject?.status === "PUBLIC");
+
+    useEffect(() => {
+      if (selectedProject) {
+        setIsPublic(selectedProject.status === "PUBLIC");
+      }
+    }, [selectedProject]);
 
     const today = {
         year: new Date().getFullYear(),
@@ -153,6 +173,41 @@ const ProjectSchedule: React.FC = () => {
         return days;
     };
 
+    //설정 창
+    const toggleSettings = () => {
+      setIsOpen((prev) => !prev);
+    };
+
+    // ✅ 토글 버튼 클릭 시 상태 변경
+    const toggleVisibility = async () => {
+      try {
+        const token = localStorage.getItem("jwtToken"); 
+        const projectId = selectedProject?.id;
+
+        if (!projectId) return;
+
+        // 서버에 PATCH 요청 보내기 (공개 여부 변경)
+        const response = await axios.patch(
+          `${process.env.NEXT_PUBLIC_API_URL}/api/projects/${selectedProject.id}/visibility`,
+          {},
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+            withCredentials: true,
+          }
+        );
+
+        if (response.status === 200) {
+          setIsPublic((prev) => !prev);
+          dispatch(fetchProjectById(projectId));
+        }
+      } catch (error) {
+        console.error("프로젝트 공개 설정 변경 오류:", error);
+      }
+    };
+
 
     return(
         <div className={styles.container}>
@@ -173,6 +228,29 @@ const ProjectSchedule: React.FC = () => {
         <button onClick={handleNextDay} className={styles.dateBtn}>
           &gt;
         </button>
+
+        {/* 설정 및 검색 버튼 */}
+        <div className={styles.optionContainer}>
+          <button className={styles.searchBtn}>
+            <FiSearch size={35} />
+          </button>
+          <button className={styles.optionBtn} onClick={toggleSettings}>
+            <SlOptions size={35} />
+          </button>
+
+          {/* 설정창 */}
+          {isOpen && (
+            <div className={styles.optionPage}>
+              <h2>프로젝트 공개</h2>
+              <div 
+                className={`${styles.toggleSwitch} ${isPublic ? styles.on : styles.off}`} 
+                onClick={toggleVisibility}
+              >
+                <div className={styles.toggleBall}></div>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* 시계 영역 */}

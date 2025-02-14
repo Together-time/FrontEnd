@@ -142,3 +142,86 @@
     visibility: hidden;
 }
   
+/*검색 및 설정*/
+.optionContainer {
+    position: absolute;
+    right: 0;
+    margin-right: 4%;
+}
+
+.searchBtn {
+    color: rgb(85, 38, 0);
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+}
+
+.optionBtn {
+    margin-left: 20px;
+    color: rgb(85, 38, 0);
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+}
+
+.searchBtn:hover svg, .optionBtn:hover svg {
+    transform: scale(1.2); 
+    transition: transform 0.2s ease-in-out; 
+}
+
+.optionPage {
+    position: absolute;
+    top: 45px; 
+    right: 0;
+    width: 300px; 
+    height: 80px;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    padding: 20px;
+    font-size: 14px;
+    z-index: 1000;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.toggleSwitch {
+    width: 50px;
+    height: 24px;
+    border-radius: 12px;
+    background-color: #ccc; 
+    display: flex;
+    align-items: center;
+    padding: 3px;
+    cursor: pointer;
+    transition: background-color 0.3s ease-in-out;
+}
+  
+.toggleBall {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background-color: white;
+    transition: transform 0.3s ease-in-out;
+}
+  
+/* ON 상태 (초록색) */
+.on {
+    background-color: #4CAF50; 
+}
+  
+.on .toggleBall {
+    transform: translateX(26px); 
+}
+  
+/* OFF 상태 (회색) */
+.off {
+    background-color: #ccc;
+}
+  
+.off .toggleBall {
+    transform: translateX(0);
+}
