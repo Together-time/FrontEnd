@@ -135,10 +135,7 @@ const ChartSchedule: React.FC = () => {
                 `${process.env.NEXT_PUBLIC_API_URL}/api/schedule/${projectId}`, //프로젝트 ID 포함
                 scheduleData,
                 {
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${token}`,
-                    },
+                    withCredentials: true 
                 }
             );
 

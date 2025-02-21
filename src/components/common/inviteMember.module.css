@@ -64,10 +64,19 @@
     width: 20%;
     height: 40px;
     border-radius: 0 10px 10px 0;
-    cursor: pointer;
     background-color: rgb(230, 192, 157);
     color: white;
     font-size: 17px;
     font-weight: bold;
     border: rgb(230, 192, 157);
+}
+
+.searchMemberBtn.selected {
+    background-color: rgb(180, 72, 0);
+    cursor: pointer;
+    color: white;
+}
+
+.searchResultItem{
+    cursor: pointer;
 }

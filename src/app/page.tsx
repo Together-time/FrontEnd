@@ -7,6 +7,7 @@ import ProjectInformation from "@/components/projectInformation/projectInformati
 import Schedule from "@/components/projectSchedule/projectSchedule";
 import KakaoLogin from "./images/kakaoLogin.png";
 import Image from "next/image";
+import axios from "axios";
 import "@/app/page.css";
 
 const Home: React.FC = () => {
@@ -16,81 +17,60 @@ const Home: React.FC = () => {
   const [user, setUser] = useState<{ nickname: string; email: string; online: boolean } | null>(null);
   const router = useRouter();
 
-  interface KakaoUser {
-    nickname: string;
-    email: string;
-    jwtToken: string;
-    online: boolean;
-  }
-
-  
-  // 환경 변수
-  const API_URL = process.env.NEXT_PUBLIC_API_URL;
-  const REDIRECT_URI = process.env.NEXT_PUBLIC_KAKAO_REDIRECT_URI;
-  const CLIENT_ID = process.env.NEXT_PUBLIC_KAKAO_CLIENT_ID;
-
   // 카카오 로그인 URL 생성
-  const KAKAO_AUTH_URL = `https://kauth.kakao.com/oauth/authorize?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=code`;
+  const KAKAO_AUTH_URL = `${process.env.NEXT_PUBLIC_API_URL}/oauth2/authorization/kakao`;
+
 
   // 로그인 상태 확인
   useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const jwtToken = urlParams.get("token"); // URL에서 토큰 가져오기
     const loginAttempted = sessionStorage.getItem("loginAttempted");
-
-    if (jwtToken && loginAttempted === "true") {
-      // 사용자가 로그인 버튼을 클릭한 경우에만 처리
-      localStorage.setItem("jwtToken", jwtToken); // JWT 토큰 저장
-
-      setIsLoggedIn(true);
-
-      // ✅ 사용자 정보 요청
-      fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/user`, {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${jwtToken}`,
-        },
-      })
+  
+    if (loginAttempted === "true") {
+      axios
+        .get(`${process.env.NEXT_PUBLIC_API_URL}/api/member/user`, {
+          withCredentials: true,
+        })
         .then((response) => {
-          const contentType = response.headers.get("content-type");
-          if (contentType && contentType.includes("application/json")) {
-            return response.json(); // ✅ JSON 응답
+          console.log("📌 API 응답 데이터:", response.data);
+  
+          let userInfo;
+  
+          if (typeof response.data === "string") {
+            userInfo = { name: response.data };
+          } else if (response.data && typeof response.data === "object" && response.data.name) {
+            userInfo = { name: response.data.name };
           } else {
-            return response.text(); // ❌ 일반 텍스트 응답
+            console.warn("⚠ 예상치 못한 응답 형식:", response.data);
+            userInfo = { name: "알 수 없음" };
           }
+  
+          // localStorage에 저장
+          localStorage.setItem("userInfo", JSON.stringify(userInfo));
+  
+          setIsLoggedIn(true);
         })
-        .then((data) => {
-          if (typeof data === "string") {
-            // ❌ 일반 텍스트 응답 처리
-            console.warn("⚠ 예상치 못한 응답 형식:", data);
-            localStorage.setItem("userInfo", JSON.stringify({ email: data }));
-          } else {
-            // ✅ JSON 응답 처리
-            console.log("✅ 사용자 정보:", data);
-            localStorage.setItem("userInfo", JSON.stringify(data)); // 로컬스토리지 저장
-          }
+        .catch((error) => {
+          console.error("❌ 사용자 정보 요청 실패:", error.response?.data || error.message);
+          setIsLoggedIn(false);
         })
-        .catch((error) => console.error("❌ 사용자 정보 요청 실패:", error));
-
-      // URL에서 토큰 제거
-      window.history.replaceState({}, document.title, window.location.pathname);
-
-      sessionStorage.removeItem("loginAttempted"); // 로그인 시도 상태 초기화
-      setIsCheckingLogin(false);
-    } else if (loginAttempted !== "true") {
-      // 사용자가 로그인 버튼을 누르지 않은 경우
-      sessionStorage.removeItem("loginAttempted"); // 초기화
-      localStorage.removeItem("jwtToken"); // JWT 토큰 제거
+        .finally(() => {
+          sessionStorage.removeItem("loginAttempted");
+          setIsCheckingLogin(false);
+        });
+    } else {
+      sessionStorage.removeItem("loginAttempted");
       setIsLoggedIn(false);
       setIsCheckingLogin(false);
     }
   }, []);
+  
+
 
   // 카카오 로그인 핸들러
   const handleKakaoLogin = () => {
     console.log("카카오 로그인 시도...");
     sessionStorage.setItem("loginAttempted", "true"); // 로그인 시도 상태 저장
-    window.location.href = KAKAO_AUTH_URL; // 카카오 로그인 페이지로 리디렉션
+    window.location.href = KAKAO_AUTH_URL; 
   };
 
   // 로그인 상태 확인 중 로딩 화면 표시
@@ -106,7 +86,7 @@ const Home: React.FC = () => {
             src={KakaoLogin}
             alt="카카오 로그인"
             className="login-btn"
-            onClick={handleKakaoLogin} // 로그인 버튼 클릭 핸들러
+            onClick={handleKakaoLogin}
           />
         </div>
       ) : (

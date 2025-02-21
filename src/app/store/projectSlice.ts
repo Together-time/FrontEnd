@@ -33,17 +33,11 @@ export const fetchProjects = createAsyncThunk<Project[], void, { rejectValue: st
     'project/fetchProjects',
     async (_, thunkAPI) => {
       try {
-        const token = localStorage.getItem('jwtToken'); 
-        if (!token) {
-          console.error('JWT 토큰이 없습니다.');
-          throw new Error('Unauthorized: JWT 토큰이 필요합니다.');
-        }
-  
         const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/team`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          withCredentials: true, 
         });
+
+        console.log("프로젝트 가져오기 요청: ", response);
   
         return response.data; 
       } catch (error: any) {

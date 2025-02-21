@@ -178,7 +178,7 @@ const ProjectSchedule: React.FC = () => {
       setIsOpen((prev) => !prev);
     };
 
-    // ✅ 토글 버튼 클릭 시 상태 변경
+    // 토글 버튼 클릭 시 상태 변경
     const toggleVisibility = async () => {
       try {
         const token = localStorage.getItem("jwtToken"); 
@@ -191,10 +191,6 @@ const ProjectSchedule: React.FC = () => {
           `${process.env.NEXT_PUBLIC_API_URL}/api/projects/${selectedProject.id}/visibility`,
           {},
           {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "application/json",
-            },
             withCredentials: true,
           }
         );

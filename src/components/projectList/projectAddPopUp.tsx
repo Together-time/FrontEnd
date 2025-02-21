@@ -71,10 +71,7 @@ const projectAddPopUp: React.FC<PopupProps> = ({ isOpen, onClose }) => {
                 `${process.env.NEXT_PUBLIC_API_URL}/api/projects`,
                 projectData,
                 {
-                    headers: {
-                        'Content-Type': 'application/json',
-                        Authorization: `Bearer ${jwtToken}`,
-                    },
+                    withCredentials: true, 
                 }
             );
             if (response.status === 200) {

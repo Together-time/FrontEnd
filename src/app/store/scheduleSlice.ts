@@ -36,16 +36,10 @@ export const fetchProjectSchedules = createAsyncThunk<
     "schedule/fetchProjectSchedules",
     async (projectId, thunkAPI) => {
         try {
-            const token = localStorage.getItem("jwtToken");
-            if (!token) {
-                console.error("JWT 토큰 없음");
-                throw new Error("JWT 토큰을 필요합니다.");
-            }
-
             const response = await axios.get(
                 `${process.env.NEXT_PUBLIC_API_URL}/api/schedule/${projectId}`,
                 {
-                    headers: { Authorization: `Bearer ${token}`},
+                    withCredentials: true, 
                 }
             );
 

@@ -9,6 +9,7 @@ import { fetchProjects, Project } from '@/app/store/projectSlice';
 import { setSelectedProject } from '@/app/store/selectedProjectSlice';
 import { fetchProjectMembers } from "@/app/store/teamSlice";
 import { RootState } from "@/app/store/store";
+import { fetchMessages, fetchUnreadCount } from "@/app/store/chatSlice";
 import { fetchProjectSchedules } from "@/app/store/scheduleSlice";
 
 const ProjectList: React.FC = () => {
@@ -23,11 +24,6 @@ const ProjectList: React.FC = () => {
 
   // 프로젝트 데이터 로드
   useEffect(() => {
-    const token = localStorage.getItem('jwtToken');
-    if (!token) {
-      console.log('JWT 토큰이 없습니다. fetchProjects를 호출하지 않습니다.');
-      return;
-    }
     // 프로젝트 데이터를 Redux 상태로 가져오기
     dispatch(fetchProjects())
       .unwrap()
@@ -44,6 +40,9 @@ const ProjectList: React.FC = () => {
   const handleProjectClick = (project: Project) => {
     dispatch(setSelectedProject(project));
     dispatch(fetchProjectMembers(project.id));
+    //채팅 슬라이스에 projectId 전달
+    dispatch(fetchMessages({ projectId: project.id })); // ✅ 채팅 메시지 로드
+    dispatch(fetchUnreadCount({ projectId: project.id }));
     console.log('프로젝트 상세 정보:', project);
   };
 

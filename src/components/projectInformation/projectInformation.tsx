@@ -1,36 +1,65 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
+import { useAppDispatch, RootState } from "@/app/store/store";
 import InvitePopup from '@/components/common/inviteMember';
 import EditTagPopup from './tagEditPopup';
 import { FaRegCommentDots } from "react-icons/fa";
 import styles from "./projectInformation.module.css";
 import { useAppSelector } from '@/app/store/store';
+import useChatWebSocket from "@/app/hooks/useChatWebSocket";
+import { fetchMessages, fetchUnreadCount } from "@/app/store/chatSlice";
 
 
 const ProjectInformation: React.FC = () => {
     const [isInviteMember, setIsInviteMember] = useState(false);
     const [isEditTags, setIsEditTags] = useState(false);
     const [showChat, setShowChat] = useState(false);
+    const [input, setInput] = useState("");
+    const [userName, setUserName] = useState<string | null>(null);
+    const dispatch = useAppDispatch();
 
     //프로젝트 정보 가져오기
     const selectedProject = useAppSelector((state) => state.selectedProject.selectedProject);
+    const projectId = selectedProject?.id;
+    const { messages, sendMessage } = useChatWebSocket();
     //팀원 목록 가져오기
     const members = useAppSelector((state) => state.team.members);
     const loading = useAppSelector((state) => state.team.loading);
     const error = useAppSelector((state) => state.team.error);
 
+    //사용자 이름 가져오기
+    useEffect(() => {
+        const storedUser = localStorage.getItem("userInfo");
+        if (storedUser) {
+            try {
+                const userData = JSON.parse(storedUser);
+                setUserName(userData.name);
+            } catch (error) {
+                console.error("사용자 정보가 없습니다:", error);
+            }
+        }
+    }, []);
+
+    useEffect(() => {
+        if (projectId) {
+            dispatch(fetchMessages({ projectId })); 
+            dispatch(fetchUnreadCount({ projectId }));
+        }
+    }, [dispatch, projectId]); 
+
     // 🔹 접속 중인 사용자를 상단에 정렬하는 임시 로직 추가
     const sortedUsers = [...members]
     .map((user) => ({
       ...user,
-      isOnline: Math.random() > 0.5, // ✅ 50% 확률로 온라인 상태 설정 (임시)
+      isOnline: Math.random() > 0.5, 
     }))
     .sort((a, b) => {
       if (a.isOnline === b.isOnline) {
-        return a.nickname.localeCompare(b.nickname); // 같은 상태면 이름순 정렬
+        return a.nickname.localeCompare(b.nickname); 
       }
-      return b.isOnline ? 1 : -1; // `isOnline === true`이면 위쪽으로 배치
+      return b.isOnline ? 1 : -1; 
     });
   
   
@@ -51,6 +80,14 @@ const ProjectInformation: React.FC = () => {
 
     // 채팅창 닫기
     const closeChat = () => setShowChat(false);
+
+    //채팅 보내기
+    const handleSend = () => {
+        if (input.trim()) {
+            sendMessage(input);
+            setInput("");
+        }
+    };
 
     return(
 <div>
@@ -104,7 +141,7 @@ const ProjectInformation: React.FC = () => {
                                 {unreadMessages > 99 ? "99+" : unreadMessages}
                             </span>
                         </div>
-                        <h2>사용자 이름</h2>
+                        <h2>{userName ? userName : "로그인해주세요"}</h2>
                     </div>
                 </div>
             ) : (
@@ -119,9 +156,20 @@ const ProjectInformation: React.FC = () => {
                         </button>
                     </div>
                     <div>
-                    
+                    {messages.length === 0 ? (
+                        <p>메시지가 없습니다.</p>
+                        ) : (
+                        messages.map((msg:any, index:any) => (
+                            <div key={index} className="chat-message">
+                            {msg}
+                            </div>
+                        ))
+                    )}
                     </div>
-                    <h2>채팅창</h2>
+                    <div className={styles.chatInput}>
+                        <input value={input} onChange={(e)=> setInput(e.target.value)} />
+                        <button onClick={handleSend}>전송</button>
+                    </div>
                 </div>
             )}
         </div>

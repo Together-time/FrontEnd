@@ -60,10 +60,6 @@ const TagEditPopup: React.FC<PopupProps> = ({ isOpen, onClose }) => {
                 `${process.env.NEXT_PUBLIC_API_URL}/api/projects/${selectedProject.id}/tag`,
                 tags ,
                 {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                        "Content-Type": "application/json",
-                    },
                     withCredentials: true 
                 }
             );
