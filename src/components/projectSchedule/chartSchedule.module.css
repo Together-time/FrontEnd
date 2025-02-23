@@ -146,6 +146,10 @@
     gap: 10px; 
 }
 
+.dateContainer {
+    width: 110px;
+}
+
 .timeContainer h2 {
     margin-bottom: 5px;
 }

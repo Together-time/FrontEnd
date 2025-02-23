@@ -1,9 +1,10 @@
 "use client"
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import styles from "./clockSchedule.module.css";
 import { useAppDispatch, useAppSelector } from '@/app/store/store';
 import { fetchProjectSchedules } from "@/app/store/scheduleSlice";
+import { fetchDeleteSchedule } from "@/app/store/scheduleSlice";
 import { RootState } from "@/app/store/store";
 
 const ClockSchedule = () => {
@@ -15,6 +16,12 @@ const ClockSchedule = () => {
     const [minuteAngle, setMinuteAngle] = useState(0);
     const [isAM, setIsAM] = useState(true);
     const [isOpen, setIsOpen] = useState(false);
+    const [openMenuId, setOpenMenuId] = useState<number | null>(null);
+    const [menuPosition, setMenuPosition] = useState<{ top: number; left: number }>({ top: 0, left: 0 });
+    const buttonRefs = useRef<{ [key: number]: HTMLButtonElement | null }>({});
+    const setButtonRef = (scheduleId: number) => (el: HTMLButtonElement | null) => {
+        buttonRefs.current[scheduleId] = el;
+    };    
 
     // Redux에서 프로젝트 데이터 불러오기
     const selectedProject = useAppSelector((state: RootState) => state.selectedProject.selectedProject);
@@ -22,7 +29,7 @@ const ClockSchedule = () => {
     const schedules = useAppSelector((state: RootState) => state.schedule.schedules);
     
     const dispatch = useAppDispatch();
-
+  
     //스케쥴 정보 가져오기
     useEffect(() => {
         if (projectId) {
@@ -139,6 +146,54 @@ const ClockSchedule = () => {
         });
     };
 
+    // 메뉴 토글 핸들러
+    const toggleMenu = (scheduleId: number, event: React.MouseEvent<HTMLButtonElement>) => {
+        if (openMenuId === scheduleId) {
+            setOpenMenuId(null); 
+        } else {
+            const button = buttonRefs.current[scheduleId]; 
+            if (button) {
+                const rect = button.getBoundingClientRect();
+                const menuHeight = 50; 
+                
+                setMenuPosition({
+                    top: Math.round(rect.bottom + window.scrollY),
+                    left: Math.round(rect.left + window.scrollX - 50),
+                });
+            }
+            setOpenMenuId(scheduleId);
+        }
+    };
+
+
+    // 바깥 클릭 시 메뉴 닫기
+    const handleClickOutside = (event: MouseEvent) => {
+        const target = event.target as HTMLElement;
+        if (!target.closest(`.${styles.optionsMenu}`) && !target.closest(`.${styles.optionsButton}`)) {
+            setOpenMenuId(null);
+        }
+    };
+    
+
+    // 컴포넌트가 마운트될 때 이벤트 리스너 추가
+    useEffect(() => {
+        document.addEventListener("click", handleClickOutside);
+        return () => document.removeEventListener("click", handleClickOutside);
+    }, []);
+
+    // 일정 삭제 핸들러
+    const handleDelete = (scheduleId: number | undefined) => {
+        if (!projectId || !scheduleId) {
+            console.error("프로젝트 ID 또는 일정 ID가 유효하지 않습니다.");
+            return;
+        }
+    
+        if (window.confirm("정말 삭제하시겠습니까?")) {
+            dispatch(fetchDeleteSchedule({ projectId, scheduleId }));
+        }
+    };
+
+
     return (
         <div>
             <div className={styles.clockContainer}>
@@ -184,7 +239,7 @@ const ClockSchedule = () => {
                                 } as React.CSSProperties}>
                 
                                 <h2 className={styles.scheduleTitle}style={{
-                                    transform: `rotate(calc(var(--text-angle) - 90deg)) rotate(${flipText}deg)`, // ✅ JSX에서 scaleX() 직접 적용
+                                    transform: `rotate(calc(var(--text-angle) - 90deg)) rotate(${flipText}deg)`, 
                                     transformOrigin: "center"
                                 }}>{schedule.title}</h2>
                             </div>
@@ -226,7 +281,27 @@ const ClockSchedule = () => {
                                     {formatTime(schedule.startedTime)} ~ {formatTime(schedule.endedTime)}
                                 </p>
                             </div>
-                            <button className={styles.optionsButton}>⋮</button>
+                            <button
+                                ref={setButtonRef(schedule.id)}
+                                className={styles.optionsButton}
+                                onClick={(e) => toggleMenu(schedule.id, e)}
+                            >
+                                ⋮
+                            </button>
+                            {/* 옵션 메뉴 (수정, 삭제) */}
+                            {openMenuId === schedule.id && (
+                                <div
+                                    className={styles.optionsMenu}
+                                    style={{ top: `${menuPosition.top}px`, left: `${menuPosition.left}px` }}
+                                >
+                                    <button className={styles.optionItem}>
+                                        수정
+                                    </button>
+                                    <button className={styles.optionItem} onClick={() => handleDelete(schedule.id)}>
+                                        일정 삭제
+                                    </button>
+                                </div>
+                            )}
                         </div>
                     ))
                 )}

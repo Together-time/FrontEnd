@@ -167,6 +167,7 @@
 
 .scheduleTitle {
     position: absolute;
+    width: 6vw;
     font-size: 20px;
     color: white;
     text-align: center;
@@ -174,10 +175,11 @@
     border-radius: 5px;
     white-space: nowrap;
     mix-blend-mode: normal;
+    overflow: hidden;
     z-index: 20;
     pointer-events: none;
-
-    text-overflow: none;
+    text-overflow: ellipsis;
+    word-break: break-word;
     transform-origin: center;
 }
 
@@ -242,4 +244,29 @@
     color: black;
     padding: 5px;
     flex-shrink: 0; 
+}
+
+.optionsMenu {
+    position: fixed;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    z-index: 10;
+    overflow-x: hidden;
+}
+
+.optionItem {
+    background: none;
+    border: none;
+    padding: 10px;
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+}
+
+.optionItem:hover {
+    background: #f0f0f0;
 }

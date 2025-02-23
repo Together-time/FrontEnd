@@ -5,6 +5,7 @@ import selectedProjectReducer from './selectedProjectSlice';
 import teamReducer from './teamSlice';
 import scheduleReducer from './scheduleSlice';
 import chatReducer from './chatSlice';
+import searchReducer from './searchSlice';
 
 export const store = configureStore({
     reducer: {
@@ -13,6 +14,7 @@ export const store = configureStore({
         team: teamReducer,
         schedule: scheduleReducer,
         chat: chatReducer,
+        search: searchReducer,
     },
 });
 

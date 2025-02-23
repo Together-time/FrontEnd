@@ -1,6 +1,7 @@
 "use client"
 
 import React, {useState, useEffect} from "react";
+import { useRouter } from "next/navigation";
 import styles from "./projectSchedule.module.css";
 import Clock from "./clockSchedule";
 import Chart from "./chartSchedule";
@@ -10,10 +11,9 @@ import { RootState } from "@/app/store/store";
 import { useAppDispatch, useAppSelector } from '@/app/store/store';
 import axios from "axios";
 import { fetchProjectById } from '@/app/store/selectedProjectSlice';
-import DatePicker from "react-datepicker";
-import { newDate } from "react-datepicker/dist/date_utils";
 
 const ProjectSchedule: React.FC = () => {
+    const router = useRouter();
     const [currentDate, setCurrentDate] = useState("");
     const [selectedDate, setSelectedDate] = useState<Date>(new Date());
     const [showCalendar, setShowCalendar] = useState(false);
@@ -204,6 +204,11 @@ const ProjectSchedule: React.FC = () => {
       }
     };
 
+    //검색 페이지로 이동
+    const handleSearch = () => {
+      router.push("/search");
+    };
+
 
     return(
         <div className={styles.container}>
@@ -227,7 +232,7 @@ const ProjectSchedule: React.FC = () => {
 
         {/* 설정 및 검색 버튼 */}
         <div className={styles.optionContainer}>
-          <button className={styles.searchBtn}>
+          <button className={styles.searchBtn} onClick={handleSearch}>
             <FiSearch size={35} />
           </button>
           <button className={styles.optionBtn} onClick={toggleSettings}>

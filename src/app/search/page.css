@@ -1,0 +1,50 @@
+@font-face {
+    font-family: 'KyoboHand';
+    src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_20-04@1.0/KyoboHand.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+body{
+    background-color:rgb(253, 250, 243);
+    font-family: 'KyoboHand';
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.searchPage{
+    margin-top: 10vh;
+    position: relative;
+    width: 60vw;
+}
+
+.searchInput{
+    font-family: 'KyoboHand';
+    background-color:rgb(253, 250, 243);
+    width: 100%;
+    height: 10vh;
+    background-color: transparent;
+    border: none;
+    border-bottom: 3px solid black;
+    padding: 20px;
+    font-size: 24px;
+    outline: none;
+}
+
+.searchIcon {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: gray;
+    cursor: pointer;
+    font-size: 36px;
+    transition: transform 0.2s ease-in-out;
+}
+
+.searchIcon:hover {
+    color: rgb(251, 189, 76);
+    transform: translateY(-50%) scale(1.2);
+}

@@ -35,17 +35,13 @@ const InvitePopup: React.FC<PopupProps> = ({ isOpen, onClose }) => {
         }
 
         setLoading(true);
-        const token = localStorage.getItem("jwtToken");
       
         try {
           const response = await axios.get(
             `${process.env.NEXT_PUBLIC_API_URL}/api/member`,
             {
               params: { keyword },
-              headers: { 
-                Authorization: `Bearer ${token}`, 
-                "Content-Type": "application/json"
-              }
+              withCredentials: true,
             }
           );
       
@@ -71,18 +67,12 @@ const InvitePopup: React.FC<PopupProps> = ({ isOpen, onClose }) => {
     //팀원 초대 요청
     const handleInviteMember = async () => {
         if (!selectedMember) return;
-
+    
         setIsInviting(true);
-        const token = localStorage.getItem("jwtToken");
-
+    
         try {
             const projectId = Number(selectedProject?.id);
-
-            console.log("🔹 초대 요청 데이터:", {
-                member: selectedMember,
-                projectId: projectId
-              });
-
+    
             const response = await axios.post(
                 `${process.env.NEXT_PUBLIC_API_URL}/api/team`,
                 {
@@ -90,10 +80,10 @@ const InvitePopup: React.FC<PopupProps> = ({ isOpen, onClose }) => {
                     projectId: projectId
                 },
                 {
-                    withCredentials: true 
+                    withCredentials: true
                 }
             );
-
+    
             if (response.status === 200) {
                 alert(`${selectedMember.nickname}님이 초대되었습니다!`);
                 setSelectedMember(null);
@@ -107,6 +97,7 @@ const InvitePopup: React.FC<PopupProps> = ({ isOpen, onClose }) => {
             setIsInviting(false);
         }
     };
+    
 
     return(
         <div className={styles.addMemberPopupOverlay} onClick={onClose}>

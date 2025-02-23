@@ -33,20 +33,23 @@ const Home: React.FC = () => {
         .then((response) => {
           console.log("📌 API 응답 데이터:", response.data);
   
-          let userInfo;
+          if (response.data && typeof response.data === "object") {
+            const userInfo = {
+              nickname: response.data.nickname || "알 수 없음",
+              email: response.data.email || "unknown@example.com",
+            };
+
+            console.log("✅ 저장할 사용자 정보:", userInfo);
+
+            // ✅ localStorage에 저장
+            localStorage.setItem("userInfo", JSON.stringify(userInfo));
+
+            console.log("✅ localStorage에 저장된 사용자 정보:", localStorage.getItem("userInfo"));
   
-          if (typeof response.data === "string") {
-            userInfo = { name: response.data };
-          } else if (response.data && typeof response.data === "object" && response.data.name) {
-            userInfo = { name: response.data.name };
           } else {
             console.warn("⚠ 예상치 못한 응답 형식:", response.data);
-            userInfo = { name: "알 수 없음" };
           }
-  
-          // localStorage에 저장
-          localStorage.setItem("userInfo", JSON.stringify(userInfo));
-  
+    
           setIsLoggedIn(true);
         })
         .catch((error) => {

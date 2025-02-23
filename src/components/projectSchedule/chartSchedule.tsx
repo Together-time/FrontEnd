@@ -123,16 +123,16 @@ const ChartSchedule: React.FC = () => {
         const scheduleData = {
             title: schedule,
             memo: memo || "",
-            startedDate: selectedDate.toISOString().split("T")[0], // YYYY-MM-DD 형식
+            startedDate: selectedDate.toISOString().split("T")[0], 
             startedTime: selectedStartTime,
-            endedDate: selectedDate.toISOString().split("T")[0], // 동일한 날짜 사용
+            endedDate: selectedDate.toISOString().split("T")[0], 
             endedTime: selectedEndTime,
-            color: selectedColor, // 색상 이름 (orange, blue 등)
+            color: selectedColor, 
         };
 
         try {
             const response = await axios.post( 
-                `${process.env.NEXT_PUBLIC_API_URL}/api/schedule/${projectId}`, //프로젝트 ID 포함
+                `${process.env.NEXT_PUBLIC_API_URL}/api/schedule/${projectId}`,
                 scheduleData,
                 {
                     withCredentials: true 
@@ -238,7 +238,7 @@ const ChartSchedule: React.FC = () => {
                                 <div className={styles.timeContainer}>
                                     <h2>시작 시간</h2>
                                     <div className={styles.rightAlign}>
-                                        <h3>{selectedDate.toLocaleDateString() || "날짜를 선택하세요"}</h3>
+                                        <h3 className={styles.dateContainer}>{selectedDate.toLocaleDateString() || "날짜를 선택하세요"}</h3>
                                         <input
                                             type="time"
                                             className={styles.timeInput}
@@ -250,7 +250,7 @@ const ChartSchedule: React.FC = () => {
                                 <div className={styles.timeContainer}>
                                     <h2>종료 시간</h2>
                                     <div className={styles.rightAlign}>
-                                        <h3>{selectedDate.toLocaleDateString() || "날짜를 선택하세요"}</h3>
+                                        <h3 className={styles.dateContainer}>{selectedDate.toLocaleDateString() || "날짜를 선택하세요"}</h3>
                                         <input
                                             type="time"
                                             className={styles.timeInput}

@@ -51,6 +51,27 @@ export const fetchProjectSchedules = createAsyncThunk<
     }
 );
 
+//일정 삭제
+export const fetchDeleteSchedule = createAsyncThunk<
+    number, // 반환값 (삭제된 scheduleId)
+    { projectId: number; scheduleId: number }, 
+    { rejectValue: string }
+>(
+    "schedule/deleteSchedule",
+    async ({ projectId, scheduleId }, thunkAPI) => {
+        try {
+            await axios.delete(
+                `${process.env.NEXT_PUBLIC_API_URL}/api/schedule/${projectId}/${scheduleId}`,
+                { withCredentials: true }
+            );
+            return scheduleId;
+        } catch (error: any) {
+            console.error("일정 삭제 오류:", error.response?.data || error.message);
+            return thunkAPI.rejectWithValue(error.response?.data || "일정을 삭제할 수 없습니다.");
+        }
+    }
+);
+
 //Slice 생성
 const scheduleSlice = createSlice({
     name: "schedule",
@@ -77,6 +98,13 @@ const scheduleSlice = createSlice({
             .addCase(fetchProjectSchedules.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload || "일정 데이터를 불러오지 못했습니다.";
+            })
+            // 일정 삭제 후 Redux 상태 업데이트
+            .addCase(fetchDeleteSchedule.fulfilled, (state, action: PayloadAction<number>) => {
+                state.schedules = state.schedules.filter(schedule => schedule.id !== action.payload);
+            })
+            .addCase(fetchDeleteSchedule.rejected, (state, action) => {
+                state.error = action.payload || "일정을 삭제하지 못했습니다.";
             });
     },
 });
