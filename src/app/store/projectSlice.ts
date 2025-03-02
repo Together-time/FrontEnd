@@ -46,7 +46,28 @@ export const fetchProjects = createAsyncThunk<Project[], void, { rejectValue: st
       }
     }
   );
-  
+
+
+//프로젝트 삭제
+export const fetchDeleteProject = createAsyncThunk<
+  number,
+  number,
+  {rejectValue: string}
+>(
+  "project/fetchDeleteProject",
+  async (projectId, thunkAPI) => {
+    try {
+      await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/api/projects/${projectId}`, {
+        withCredentials: true,
+      });
+
+      console.log("프로젝트 삭제:", projectId);
+      return projectId;
+    } catch(error: any){
+      return thunkAPI.rejectWithValue(error.response?.data);
+    }
+  }
+);
 
 const projectSlice = createSlice({
     name: 'project',
@@ -64,7 +85,14 @@ const projectSlice = createSlice({
         })
         .addCase(fetchProjects.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload || 'Something went wrong';
+        state.error = action.payload || '정보 불러오기 실패패';
+        })
+        //프로젝트 삭제
+        .addCase(fetchDeleteProject.fulfilled, (state, action) => {
+          state.projects = state.projects.filter(project => project.id !== action.payload);
+        })
+        .addCase(fetchDeleteProject.rejected, (state, action) => {
+          state.error = action.payload || "프로젝트 삭제 실패";
         });
     },
 });

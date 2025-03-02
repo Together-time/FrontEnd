@@ -6,9 +6,11 @@ import teamReducer from './teamSlice';
 import scheduleReducer from './scheduleSlice';
 import chatReducer from './chatSlice';
 import searchReducer from './searchSlice';
+import authReducer from './authSlice';
 
 export const store = configureStore({
     reducer: {
+        auth: authReducer,
         project: projectReducer,
         selectedProject: selectedProjectReducer,
         team: teamReducer,

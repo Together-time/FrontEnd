@@ -8,6 +8,8 @@ import Schedule from "@/components/projectSchedule/projectSchedule";
 import KakaoLogin from "./images/kakaoLogin.png";
 import Image from "next/image";
 import axios from "axios";
+import { useAppDispatch, RootState } from "@/app/store/store";
+import {logout} from "@/app/store/authSlice";
 import "@/app/page.css";
 
 const Home: React.FC = () => {
@@ -16,6 +18,7 @@ const Home: React.FC = () => {
   //사용자 정보
   const [user, setUser] = useState<{ nickname: string; email: string; online: boolean } | null>(null);
   const router = useRouter();
+  const dispatch = useAppDispatch();
 
   // 카카오 로그인 URL 생성
   const KAKAO_AUTH_URL = `${process.env.NEXT_PUBLIC_API_URL}/oauth2/authorization/kakao`;
@@ -23,49 +26,64 @@ const Home: React.FC = () => {
 
   // 로그인 상태 확인
   useEffect(() => {
-    const loginAttempted = sessionStorage.getItem("loginAttempted");
-  
-    if (loginAttempted === "true") {
-      axios
-        .get(`${process.env.NEXT_PUBLIC_API_URL}/api/member/user`, {
-          withCredentials: true,
-        })
-        .then((response) => {
-          console.log("📌 API 응답 데이터:", response.data);
-  
-          if (response.data && typeof response.data === "object") {
-            const userInfo = {
-              nickname: response.data.nickname || "알 수 없음",
-              email: response.data.email || "unknown@example.com",
-            };
+    const storedUserInfo = localStorage.getItem("userInfo");
 
-            console.log("✅ 저장할 사용자 정보:", userInfo);
-
-            // ✅ localStorage에 저장
-            localStorage.setItem("userInfo", JSON.stringify(userInfo));
-
-            console.log("✅ localStorage에 저장된 사용자 정보:", localStorage.getItem("userInfo"));
-  
-          } else {
-            console.warn("⚠ 예상치 못한 응답 형식:", response.data);
-          }
-    
-          setIsLoggedIn(true);
-        })
-        .catch((error) => {
-          console.error("❌ 사용자 정보 요청 실패:", error.response?.data || error.message);
-          setIsLoggedIn(false);
-        })
-        .finally(() => {
-          sessionStorage.removeItem("loginAttempted");
-          setIsCheckingLogin(false);
-        });
-    } else {
-      sessionStorage.removeItem("loginAttempted");
-      setIsLoggedIn(false);
+    if (storedUserInfo) {
+      setIsLoggedIn(true);
       setIsCheckingLogin(false);
+    } else {
+      const loginAttempted = sessionStorage.getItem("loginAttempted");
+
+      if (loginAttempted === "true") {
+        axios
+          .get(`${process.env.NEXT_PUBLIC_API_URL}/api/member/user`, {
+            withCredentials: true,
+          })
+          .then((response) => {
+            if (response.data && typeof response.data === "object") {
+              const userInfo = {
+                nickname: response.data.nickname || "알 수 없음",
+                email: response.data.email || "unknown@example.com",
+              };
+
+              localStorage.setItem("userInfo", JSON.stringify(userInfo));
+              setIsLoggedIn(true);
+            } else {
+              console.warn("⚠ 예상치 못한 응답 형식:", response.data);
+              setIsLoggedIn(false);
+            }
+          })
+          .catch((error) => {
+            console.error("❌ 사용자 정보 요청 실패:", error.response?.data || error.message);
+            setIsLoggedIn(false);
+          })
+          .finally(() => {
+            sessionStorage.removeItem("loginAttempted");
+            setIsCheckingLogin(false);
+          });
+      } else {
+        sessionStorage.removeItem("loginAttempted");
+        setIsLoggedIn(false);
+        setIsCheckingLogin(false);
+      }
     }
   }, []);
+
+  // 로그아웃 기능 추가
+  const handleLogout = async () => {
+    try {
+      const result = await dispatch(logout()).unwrap(); 
+      if (result === true) { 
+        localStorage.removeItem("userInfo");
+        setIsLoggedIn(false);
+      } else {
+        console.warn("⚠ 로그아웃 실패: 예상치 못한 응답 값", result);
+      }
+    } catch (error) {
+      console.error("❌ 로그아웃 요청 실패:", error);
+    }
+  };
+
   
 
 
@@ -98,7 +116,7 @@ const Home: React.FC = () => {
             <ProjectList />
           </div>
           <div className="middle">
-            <ProjectInformation />
+            <ProjectInformation handleLogout={handleLogout}/>
           </div>
           <div className="right">
             <Schedule />

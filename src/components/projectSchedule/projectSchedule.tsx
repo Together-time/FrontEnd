@@ -11,6 +11,8 @@ import { RootState } from "@/app/store/store";
 import { useAppDispatch, useAppSelector } from '@/app/store/store';
 import axios from "axios";
 import { fetchProjectById } from '@/app/store/selectedProjectSlice';
+import { logout, withdraw} from '@/app/store/authSlice';
+import { fetchDeleteProject } from "@/app/store/projectSlice";
 
 const ProjectSchedule: React.FC = () => {
     const router = useRouter();
@@ -27,6 +29,7 @@ const ProjectSchedule: React.FC = () => {
     //특정 프로젝트 데이터 불러오기
     const selectedProject = useAppSelector((state:RootState) => state.selectedProject.selectedProject);
     const [isPublic, setIsPublic] = useState(selectedProject?.status === "PUBLIC");
+    const projectId = selectedProject?.id; 
 
     useEffect(() => {
       if (selectedProject) {
@@ -181,7 +184,6 @@ const ProjectSchedule: React.FC = () => {
     // 토글 버튼 클릭 시 상태 변경
     const toggleVisibility = async () => {
       try {
-        const token = localStorage.getItem("jwtToken"); 
         const projectId = selectedProject?.id;
 
         if (!projectId) return;
@@ -207,6 +209,18 @@ const ProjectSchedule: React.FC = () => {
     //검색 페이지로 이동
     const handleSearch = () => {
       router.push("/search");
+    };
+
+    //프로젝트 삭제
+    const handleDeleteProject = () => {
+      if (projectId === undefined) {
+        console.error("🚨 프로젝트 ID가 존재하지 않습니다!");
+        return;
+      }
+
+      if(window.confirm("정말로 삭제하시겠습니까?")){
+        dispatch(fetchDeleteProject(projectId));
+      }
     };
 
 
@@ -242,12 +256,20 @@ const ProjectSchedule: React.FC = () => {
           {/* 설정창 */}
           {isOpen && (
             <div className={styles.optionPage}>
-              <h2>프로젝트 공개</h2>
-              <div 
-                className={`${styles.toggleSwitch} ${isPublic ? styles.on : styles.off}`} 
-                onClick={toggleVisibility}
-              >
-                <div className={styles.toggleBall}></div>
+              {/* 프로젝트 공개 여부 */}
+              <div className={styles.publicOption}>
+                <h2>프로젝트 공개</h2>
+                <div 
+                  className={`${styles.toggleSwitch} ${isPublic ? styles.on : styles.off}`} 
+                  onClick={toggleVisibility}
+                >
+                  <div className={styles.toggleBall}></div>
+                </div>
+              </div>
+
+              {/* 로그아웃 및 회원탈퇴 */}
+              <div className={styles.memberOptions}>
+                <button className={styles.deleteProject} onClick={handleDeleteProject}>프로젝트 삭제</button>
               </div>
             </div>
           )}

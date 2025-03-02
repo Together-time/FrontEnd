@@ -169,12 +169,13 @@
     transition: transform 0.2s ease-in-out; 
 }
 
+/*프로젝트 설정*/
 .optionPage {
     position: absolute;
     top: 45px; 
     right: 0;
     width: 300px; 
-    height: 80px;
+    height: 150px;
     background: white;
     border: 1px solid #ccc;
     border-radius: 8px;
@@ -183,9 +184,16 @@
     font-size: 14px;
     z-index: 1000;
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     align-items: center;
     justify-content: space-between;
+}
+
+.publicOption{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
 }
 
 .toggleSwitch {
@@ -208,7 +216,6 @@
     transition: transform 0.3s ease-in-out;
 }
   
-/* ON 상태 (초록색) */
 .on {
     background-color: #4CAF50; 
 }
@@ -217,11 +224,40 @@
     transform: translateX(26px); 
 }
   
-/* OFF 상태 (회색) */
 .off {
     background-color: #ccc;
 }
   
 .off .toggleBall {
     transform: translateX(0);
+}
+
+.memberOptions{
+    margin-top: 10px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: center;
+}
+
+.memberOptions button {
+    width: 90%;
+    padding: 8px;
+    border: none;
+    border-radius: 8px;
+    background-color: transparent;
+    font-size: 18px;
+    cursor: pointer;
+    transition: background-color 0.3s ease-in-out, font-size 0.3s ease-in-out;
+    font-weight: bold;
+}
+
+.deleteProject{
+    color: red;
+}
+
+.deleteProject:hover{
+    background-color: #f0f0f0;
+    transform: scale(1.2);
 }
