@@ -10,11 +10,12 @@ import Image from "next/image";
 import axios from "axios";
 import { useAppDispatch, RootState } from "@/app/store/store";
 import {logout} from "@/app/store/authSlice";
+import api from "@/app/utils/api";
 import "@/app/page.css";
 
 const Home: React.FC = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // 로그인 상태
-  const [isCheckingLogin, setIsCheckingLogin] = useState(true); // 로그인 상태 확인 중 여부
+  const [isLoggedIn, setIsLoggedIn] = useState(false); 
+  const [isCheckingLogin, setIsCheckingLogin] = useState(true);
   //사용자 정보
   const [user, setUser] = useState<{ nickname: string; email: string; online: boolean } | null>(null);
   const router = useRouter();
@@ -26,14 +27,21 @@ const Home: React.FC = () => {
 
   // 로그인 상태 확인
   useEffect(() => {
+    // 프로젝트 실행 시 로그인 기록 초기화
+    if (!sessionStorage.getItem("sessionInitialized")) {
+      console.log("🗑 프로젝트 실행 - 로그인 정보 초기화");
+      localStorage.removeItem("userInfo");
+      sessionStorage.setItem("sessionInitialized", "true"); 
+    }
+  
     const storedUserInfo = localStorage.getItem("userInfo");
-
+  
     if (storedUserInfo) {
       setIsLoggedIn(true);
       setIsCheckingLogin(false);
     } else {
       const loginAttempted = sessionStorage.getItem("loginAttempted");
-
+  
       if (loginAttempted === "true") {
         axios
           .get(`${process.env.NEXT_PUBLIC_API_URL}/api/member/user`, {
@@ -43,9 +51,9 @@ const Home: React.FC = () => {
             if (response.data && typeof response.data === "object") {
               const userInfo = {
                 nickname: response.data.nickname || "알 수 없음",
-                email: response.data.email || "unknown@example.com",
+                email: response.data.email || "",
               };
-
+  
               localStorage.setItem("userInfo", JSON.stringify(userInfo));
               setIsLoggedIn(true);
             } else {
@@ -68,6 +76,7 @@ const Home: React.FC = () => {
       }
     }
   }, []);
+  
 
   // 로그아웃 기능 추가
   const handleLogout = async () => {
