@@ -15,10 +15,12 @@ const Search: React.FC = () => {
     const dispatch = useAppDispatch();
     const { searchResults, status, error } = useSelector((state: any) => state.search);
     const [selectedProject, setSelectedProject] = useState<{ id: number; title: string } | null>(null);
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    const [ sortOption, setSortOption ] = useState("생성순");
 
     const handleSearch = () => {
         if (keyword.trim() === "") return;
-        dispatch(fetchSearchProjects(keyword));
+        dispatch(fetchSearchProjects({keyword, sort: sortOption === "생성순" ? "CREATED_DESC" : "VIEWS_DESC"}));
     }
 
     const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -27,7 +29,18 @@ const Search: React.FC = () => {
         }
     };
 
+    // 생성순/조회순 선택
+    const toggleDropdown = () => {
+        setIsDropdownOpen(!isDropdownOpen);
+    }
 
+    const handleSortChange = (option: string) => {
+        setSortOption(option);
+        setIsDropdownOpen(false);
+        dispatch(fetchSearchProjects({ keyword, sort: option === "생성순" ? "CREATED_DESC" : "VIEWS_DESC" }));
+    }
+
+    // 일정 보기
     const openPopup = (projectId: number, title: string) => {
         setSelectedProject({ id: projectId, title });
     };
@@ -45,6 +58,20 @@ const Search: React.FC = () => {
                         onChange={(e) => setKeyword(e.target.value)} 
                         onKeyDown={handleKeyPress}/>
                 <IoSearch className="searchIcon" onClick={handleSearch}/>
+            </div>
+
+            <div className="sortDropdownContainer">
+                <div className="sortDropdown">
+                    <button className="sortButton" onClick={toggleDropdown}>
+                        {sortOption}   ▼
+                    </button>
+                    {isDropdownOpen && (
+                        <ul className="sortMenu">
+                            <li onClick={() => handleSortChange("생성순")}>생성순</li>
+                            <li onClick={() => handleSortChange("조회수")}>조회수</li>
+                        </ul>
+                    )}
+                </div>
             </div>
 
             {/* 검색 결과 출력 */}

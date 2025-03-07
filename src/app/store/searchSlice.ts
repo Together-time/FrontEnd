@@ -4,29 +4,16 @@ import axios from "axios";
 //검색 및 프로젝트 정보
 export const fetchSearchProjects = createAsyncThunk(
     "search/fetchSearchProjects",
-    async (keyword: string, thunkAPI) => {
+    async ({ keyword, sort }: { keyword: string; sort: string }, thunkAPI) => {
         try {
-            console.log("🔍 검색 요청 params:", { keyword });
+          const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/projects/search`, {
+            params: { keyword, sort },
+            withCredentials: true,
+          });
+    
+          return response.data;
 
-            //검색 API 호출
-            const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/projects/search`, {
-                params: { keyword },
-                withCredentials: true,
-            });
-
-            console.log("📌 검색된 프로젝트 목록:", response.data);
-
-            //프로젝트 정보 호출(클릭 이벤트에 합쳐주기)
-            const detailedProjects = await Promise.all(
-                response.data.map(async (project:any) => {
-                    const detailResponse = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/projects/${project.projectId}`, {
-                        withCredentials: true,
-                    });
-                    return { ...project, details: detailResponse.data }; 
-                })
-            );
-
-            return detailedProjects; 
+            return response.data;
         } catch (error: any) {
             console.error("API 요청 에러: ", error.response?.data || error.message);
             return thunkAPI.rejectWithValue(error.response?.data || "검색 실패");
@@ -36,19 +23,25 @@ export const fetchSearchProjects = createAsyncThunk(
 
 //프로젝트 일정 가져오기
 export const fetchProjectSchedules = createAsyncThunk<
-    { projectId: number; schedules: any }, 
+    { projectId: number; schedules: any; details: any }, 
     number,
     { rejectValue: string } 
 >(
     "search/fetchProjectSchedules",
     async (projectId, thunkAPI) => {
         try {
-            const response = await axios.get(
+            const scheduleResponse = await axios.get(
                 `${process.env.NEXT_PUBLIC_API_URL}/api/schedule/${projectId}`,
                 { withCredentials: true }
             );
-            console.log("일정 상세: ", response);
-            return { projectId, schedules: response.data };
+
+            //프로젝트 상세 요청
+            const detailResponse = await axios.get(
+                `${process.env.NEXT_PUBLIC_API_URL}/api/projects/${projectId}`,
+                { withCredentials: true }
+            );
+            return { projectId, schedules: scheduleResponse.data, details: detailResponse.data }; 
+
         } catch (error: any) {
             return thunkAPI.rejectWithValue(error.response?.data || "일정 데이터를 가져올 수 없습니다.");
         }

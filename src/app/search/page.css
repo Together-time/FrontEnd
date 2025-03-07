@@ -10,8 +10,8 @@ body{
     font-family: 'KyoboHand';
     margin: 0;
     display: flex;
+    overflow-y: auto;
     justify-content: center;
-    align-items: center;
 }
 
 .searchPage{
@@ -35,7 +35,7 @@ body{
     height: 10vh;
     background-color: transparent;
     border: none;
-    border-bottom: 3px solid black;
+    border-bottom: 3px solid rgb(85, 38, 0);
     padding: 20px;
     font-size: 24px;
     outline: none;
@@ -56,6 +56,53 @@ body{
     color: rgb(251, 189, 76);
     transform: translateY(-50%) scale(1.2);
 }
+
+/*생성순/조회수 선택*/
+.sortDropdownContainer {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 10px;
+    padding-right: 10px; 
+}
+
+.sortDropdown {
+    position: relative;
+    display: inline-block;
+    margin-top: 10px;
+}
+  
+.sortButton {
+    background: transparent;
+    border: none;
+    padding: 15px 12px;
+    cursor: pointer;
+    font-size: 20px;
+    color: rgb(85, 38, 0);
+}
+  
+.sortMenu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    width: 100px;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+}
+  
+.sortMenu li {
+    list-style: none;
+    padding: 8px;
+    cursor: pointer;
+    font-size: 18px;
+}
+  
+.sortMenu li:hover {
+    background: #f0f0f0;
+}
+  
 
 /*검색 결과*/
 .searchList {
