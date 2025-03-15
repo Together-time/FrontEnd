@@ -4,6 +4,7 @@ import { useAppDispatch, useAppSelector, RootState } from "@/app/store/store";
 interface User {
     id: string;
     nickname: string;
+    email?: string;
     isOnline: boolean;
 }
 
@@ -23,7 +24,6 @@ export const useOnlineUsers = () => {
         console.log(`🔗 Online WebSocket 연결 시도... ${wsUrl}`);
 
         if (socketRef.current) {
-            console.log("✅ 기존 Online WebSocket이 존재함. 새로 생성하지 않음.");
             return;
         }
 
@@ -31,14 +31,23 @@ export const useOnlineUsers = () => {
         socketRef.current = socket;
 
         socket.onopen = () => {
-            console.log("✅ Online WebSocket 연결 성공");
         };
 
         socket.onmessage = (event) => {
             try {
                 const data = JSON.parse(event.data);
-                console.log("📩 Online WebSocket 메시지 수신:", data);
-
+        
+                if (data.onlineUsers) {
+                    console.log("📌 현재 접속 중인 모든 사용자:", data.onlineUsers);
+        
+                    // 기존 유저 목록을 한 번에 업데이트
+                    setUsers(data.onlineUsers.map((email: string) => ({
+                        id: email,
+                        nickname: email, 
+                        isOnline: true,
+                    })));
+                } 
+                
                 if (data.email) {
                     setUsers((prevUsers) => {
                         const existingUser = prevUsers.find((user) => user.id === data.email);
@@ -47,6 +56,7 @@ export const useOnlineUsers = () => {
                                 user.id === data.email ? { ...user, isOnline: data.isOnline } : user
                             );
                         } else {
+                            console.log("현재 접속 중인 사용자 추가:", data.email);
                             return [...prevUsers, { id: data.email, nickname: data.email, isOnline: data.isOnline }];
                         }
                     });
@@ -55,25 +65,23 @@ export const useOnlineUsers = () => {
                 console.error("🚨 Online WebSocket 메시지 처리 오류:", error);
             }
         };
+        
 
         socket.onerror = (error) => {
             console.error("🚨 Online WebSocket 오류 발생:", error);
         };
 
         socket.onclose = () => {
-            console.log("🔴 Online WebSocket 연결 종료");
             socketRef.current = null;
 
             // 자동 재연결
             setTimeout(() => {
-                console.log("♻️ Online WebSocket 재연결 시도...");
                 socketRef.current = new WebSocket(wsUrl);
             }, 3000);
         };
 
         return () => {
             if (socketRef.current) {
-                console.log("🛑 Online WebSocket 연결 종료");
                 socketRef.current.close();
                 socketRef.current = null;
             }
