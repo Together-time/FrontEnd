@@ -1,7 +1,8 @@
 import React, {useState} from "react";
 import InvitePopup from '@/components/common/inviteMember';
 import styles from './projectAddPopUp.module.css';
-import axios from 'axios';
+import { useAppDispatch } from "@/app/store/store";
+import { fetchCreateProject, fetchProjects } from "@/app/store/projectSlice";
 
 interface ProjectCommand {
     title: string;
@@ -15,6 +16,7 @@ interface PopupProps {
 
 const projectAddPopUp: React.FC<PopupProps> = ({ isOpen, onClose }) => {
     if (!isOpen) return null;
+    const dispatch = useAppDispatch();
     const [title, setTitle] = useState("");
     const [tag, setTag] = useState("")
     const [tags, setTags] = useState<string[]>([]);
@@ -53,36 +55,20 @@ const projectAddPopUp: React.FC<PopupProps> = ({ isOpen, onClose }) => {
     const openInvitePopup = () => setIsInviteMember(true);
     const closeInvitePopup = () => setIsInviteMember(false);
 
-    // 생성하기 버튼 클릭 시 실행
+    // 프로젝트 생성 요청
     const handleCreateProject = async () => {
         if (!title.trim() || tags.length < 3) {
             alert('제목을 입력하고 최소 3개의 태그를 추가해주세요.');
             return;
         }
 
-        const projectData = {
-            title,
-            tags,
-            members: [],
-        };
-
         try {
-            const response = await axios.post(
-                `${process.env.NEXT_PUBLIC_API_URL}/api/projects`,
-                projectData,
-                {
-                    withCredentials: true, 
-                }
-            );
-            if (response.status === 200) {
-                alert('프로젝트가 성공적으로 생성되었습니다.');
-                onClose();
-                window.location.reload();
-            } else {
-                alert('프로젝트 생성에 실패했습니다.');
-            }
+            await dispatch(fetchCreateProject({ title, tags, members: [] })).unwrap();
+            await dispatch(fetchProjects()).unwrap();
+            alert('프로젝트가 성공적으로 생성되었습니다.');
+            onClose();
         } catch (error) {
-            console.error('프로젝트 생성 중 오류:', error);
+            console.error('프로젝트 생성 오류:', error);
             alert('오류가 발생했습니다. 다시 시도해주세요.');
         }
     };
