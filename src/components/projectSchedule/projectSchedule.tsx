@@ -13,6 +13,7 @@ import axios from "axios";
 import { fetchProjectById } from '@/app/store/selectedProjectSlice';
 import { logout, withdraw} from '@/app/store/authSlice';
 import { fetchDeleteProject } from "@/app/store/projectSlice";
+import { fetchLeaveTeam } from "@/app/store/teamSlice";
 
 const ProjectSchedule: React.FC = () => {
     const router = useRouter();
@@ -211,10 +212,23 @@ const ProjectSchedule: React.FC = () => {
       router.push("/search");
     };
 
+    //프로젝트 나가기
+    const handleExitProject = () => {
+      if (projectId === undefined) {
+        console.error("프로젝트 ID가 존재하지 않습니다.");
+        return;
+      }
+
+      if(window.confirm("정말로 나가시겠습니까?")) {
+        dispatch(fetchLeaveTeam(projectId));
+        window.location.reload();
+      }
+    };
+
     //프로젝트 삭제
     const handleDeleteProject = () => {
       if (projectId === undefined) {
-        console.error("🚨 프로젝트 ID가 존재하지 않습니다!");
+        console.error("프로젝트 ID가 존재하지 않습니다.");
         return;
       }
 
@@ -267,8 +281,9 @@ const ProjectSchedule: React.FC = () => {
                 </div>
               </div>
 
-              {/* 로그아웃 및 회원탈퇴 */}
+              {/* 프로젝트 나가기 및 삭제 */}
               <div className={styles.memberOptions}>
+                <button className={styles.exitProject} onClick={handleExitProject}>프로젝트 나가기</button>
                 <button className={styles.deleteProject} onClick={handleDeleteProject}>프로젝트 삭제</button>
               </div>
             </div>

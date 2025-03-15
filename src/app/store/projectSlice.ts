@@ -13,6 +13,7 @@ export interface Project {
 interface Member {
   id: number;
   nickname: string;
+  email?: string;
 }
 
 

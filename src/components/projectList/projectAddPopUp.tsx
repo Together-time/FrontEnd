@@ -76,7 +76,8 @@ const projectAddPopUp: React.FC<PopupProps> = ({ isOpen, onClose }) => {
             );
             if (response.status === 200) {
                 alert('프로젝트가 성공적으로 생성되었습니다.');
-                onClose(); // 팝업 닫기
+                onClose();
+                window.location.reload();
             } else {
                 alert('프로젝트 생성에 실패했습니다.');
             }

@@ -181,10 +181,10 @@ const ClockSchedule = () => {
         return () => document.removeEventListener("click", handleClickOutside);
     }, []);
 
-    // 일정 삭제 핸들러
+    // 프로젝트트 삭제 핸들러
     const handleDelete = (scheduleId: number | undefined) => {
         if (!projectId || !scheduleId) {
-            console.error("프로젝트 ID 또는 일정 ID가 유효하지 않습니다.");
+            console.error("프로젝트 ID가 유효하지 않습니다.");
             return;
         }
     
@@ -277,6 +277,7 @@ const ClockSchedule = () => {
                             <span className={styles.textScheduleColor} style={{ backgroundColor: schedule.color }}></span>
                             <div className={styles.textScheduleContent}>
                                 <p className={styles.textScheduleTitle}>{schedule.title}</p>
+                                <p className={styles.textScheduleMemo}>{schedule.memo}</p>
                                 <p className={styles.textScheduleTime}>
                                     {formatTime(schedule.startedTime)} ~ {formatTime(schedule.endedTime)}
                                 </p>

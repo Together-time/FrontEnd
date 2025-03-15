@@ -12,6 +12,7 @@ interface SelectedProjectState {
 interface Member {
     id: number;
     nickname: string;
+    email?: string;
 }
 
 const initialState: SelectedProjectState = {

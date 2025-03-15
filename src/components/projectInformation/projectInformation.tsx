@@ -36,7 +36,7 @@ const ProjectInformation = ({ handleLogout }: { handleLogout: () => Promise<void
     const unreadCount = useSelector((state: RootState) => state.chat.unreadCount);
 
     //접속 중인 사용자 목록
-    const users = useOnlineUsers();
+    const onlineUsers = useOnlineUsers();
 
     //로그아웃 및 회원 탈퇴
     const toggleOptions = () => {
@@ -108,12 +108,15 @@ const ProjectInformation = ({ handleLogout }: { handleLogout: () => Promise<void
         );    
 
     // 🔹 접속 중인 사용자를 상단에 정렬하는 임시 로직 추가
-    const sortedUsers = [...members]
-        .map((user) => ({
+    const sortedUsers = members
+    .map((user) => {
+        const isOnline = onlineUsers.some((onlineUser) => onlineUser.id === user.email);
+        return {
             ...user,
-            isOnline: users.some((u) => u.id === String(user.id)),
-        }))
-        .sort((a, b) => (b.isOnline ? 1 : -1));
+            isOnline,
+        };
+    })
+    .sort((a, b) => (b.isOnline ? 1 : -1))
   
   
 
@@ -153,7 +156,7 @@ const ProjectInformation = ({ handleLogout }: { handleLogout: () => Promise<void
                         <h3>현재 참여 중인 인원</h3>
                         <ul className={styles.userList}>
                         {sortedUsers.map((user) => (
-                            <li key={user.id} className={styles.userItem}>
+                            <li key={user.email} className={styles.userItem}>
                             <span>{user.nickname}</span>
                             {user.isOnline && <span className={styles.onlineIndicator}></span>}
                             </li>
