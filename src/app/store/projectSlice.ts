@@ -8,6 +8,7 @@ export interface Project {
   title: string; 
   views: number;
   members?: Member[];
+  isPublic: boolean;
 }
 
 interface Member {

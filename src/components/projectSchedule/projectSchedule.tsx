@@ -9,9 +9,8 @@ import { FiSearch } from "react-icons/fi";
 import { SlOptions } from "react-icons/sl";
 import { RootState } from "@/app/store/store";
 import { useAppDispatch, useAppSelector } from '@/app/store/store';
-import axios from "axios";
+import { fetchToggleProjectVisibility } from "@/app/store/selectedProjectSlice";
 import { fetchProjectById } from '@/app/store/selectedProjectSlice';
-import { logout, withdraw} from '@/app/store/authSlice';
 import { fetchDeleteProject } from "@/app/store/projectSlice";
 import { fetchLeaveTeam } from "@/app/store/teamSlice";
 
@@ -189,23 +188,16 @@ const ProjectSchedule: React.FC = () => {
 
         if (!projectId) return;
 
-        // 서버에 PATCH 요청 보내기 (공개 여부 변경)
-        const response = await axios.patch(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/projects/${selectedProject.id}/visibility`,
-          {},
-          {
-            withCredentials: true,
-          }
-        );
+        // Redux로 공개 여부 토글 요청
+        await dispatch(fetchToggleProjectVisibility(projectId)).unwrap();
 
-        if (response.status === 200) {
-          setIsPublic((prev) => !prev);
-          dispatch(fetchProjectById(projectId));
-        }
+        // 변경된 프로젝트 데이터 다시 불러오기
+        dispatch(fetchProjectById(projectId));
       } catch (error) {
         console.error("프로젝트 공개 설정 변경 오류:", error);
       }
     };
+
 
     //검색 페이지로 이동
     const handleSearch = () => {
