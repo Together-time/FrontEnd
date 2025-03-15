@@ -8,16 +8,15 @@ import Schedule from "@/components/projectSchedule/projectSchedule";
 import KakaoLogin from "./images/kakaoLogin.png";
 import Image from "next/image";
 import axios from "axios";
-import { useAppDispatch, RootState } from "@/app/store/store";
-import {logout} from "@/app/store/authSlice";
-import api from "@/app/utils/api";
+import { useAppDispatch, useAppSelector } from "@/app/store/store";
+import { fetchUser, logout } from "@/app/store/authSlice";
 import "@/app/page.css";
 
 const Home: React.FC = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false); 
   const [isCheckingLogin, setIsCheckingLogin] = useState(true);
   //사용자 정보
-  const [user, setUser] = useState<{ nickname: string; email: string; online: boolean } | null>(null);
+  const { isAuthenticated, loading, user } = useAppSelector((state) => state.auth);
   const router = useRouter();
   const dispatch = useAppDispatch();
 
@@ -27,55 +26,28 @@ const Home: React.FC = () => {
 
   // 로그인 상태 확인
   useEffect(() => {
-    // 프로젝트 실행 시 로그인 기록 초기화
     if (!sessionStorage.getItem("sessionInitialized")) {
       console.log("🗑 프로젝트 실행 - 로그인 정보 초기화");
+      sessionStorage.setItem("sessionInitialized", "true");
       localStorage.removeItem("userInfo");
-      sessionStorage.setItem("sessionInitialized", "true"); 
     }
-  
-    const storedUserInfo = localStorage.getItem("userInfo");
-  
-    if (storedUserInfo) {
-      setIsLoggedIn(true);
-      setIsCheckingLogin(false);
-    } else {
-      const loginAttempted = sessionStorage.getItem("loginAttempted");
-  
-      if (loginAttempted === "true") {
-        axios
-          .get(`${process.env.NEXT_PUBLIC_API_URL}/api/member/user`, {
-            withCredentials: true,
-          })
-          .then((response) => {
-            if (response.data && typeof response.data === "object") {
-              const userInfo = {
-                nickname: response.data.nickname || "알 수 없음",
-                email: response.data.email || "",
-              };
-  
-              localStorage.setItem("userInfo", JSON.stringify(userInfo));
-              setIsLoggedIn(true);
-            } else {
-              console.warn("⚠ 예상치 못한 응답 형식:", response.data);
-              setIsLoggedIn(false);
-            }
-          })
-          .catch((error) => {
-            console.error("❌ 사용자 정보 요청 실패:", error.response?.data || error.message);
-            setIsLoggedIn(false);
-          })
-          .finally(() => {
-            sessionStorage.removeItem("loginAttempted");
-            setIsCheckingLogin(false);
-          });
-      } else {
-        sessionStorage.removeItem("loginAttempted");
+
+    dispatch(fetchUser())
+      .unwrap()
+      .then((userData) => {
+        if (userData) {
+          setIsLoggedIn(true);
+        } else {
+          setIsLoggedIn(false);
+        }
+      })
+      .catch(() => {
         setIsLoggedIn(false);
+      })
+      .finally(() => {
         setIsCheckingLogin(false);
-      }
-    }
-  }, []);
+      });
+  }, [dispatch]);
   
 
   // 로그아웃 기능 추가
@@ -93,13 +65,10 @@ const Home: React.FC = () => {
     }
   };
 
-  
-
-
   // 카카오 로그인 핸들러
   const handleKakaoLogin = () => {
     console.log("카카오 로그인 시도...");
-    sessionStorage.setItem("loginAttempted", "true"); // 로그인 시도 상태 저장
+    sessionStorage.setItem("loginAttempted", "true");
     window.location.href = KAKAO_AUTH_URL; 
   };
 

@@ -1,6 +1,29 @@
 import { createSlice, createAsyncThunk, isRejectedWithValue } from "@reduxjs/toolkit";
 import axios from "axios";
 
+//사용자 정보 가져오기
+export const fetchUser = createAsyncThunk(
+    "auth/fetchUser",
+    async (_, { rejectWithValue }) => {
+        try {
+            const response = await axios.get(
+                `${process.env.NEXT_PUBLIC_API_URL}/api/member/user`,
+                { withCredentials: true }
+            );
+
+            // localStorage에 사용자 정보 저장
+            localStorage.setItem("userInfo", JSON.stringify(response.data));
+
+            console.log("사용자 정보 가져오기 성공:", response.data);
+            return response.data;
+        } catch (error: any) {
+            console.error("사용자 정보 요청 실패:", error.response?.data || error.message);
+            localStorage.removeItem("userInfo"); 
+            return rejectWithValue(error.response?.data || error.message);
+        }
+    }
+);
+
 //토큰 갱신 요청
 export const refreshToken = createAsyncThunk(
     "auth/refreshToken",
@@ -55,14 +78,29 @@ const authSlice = createSlice({
         isAuthenticated: true,
         loading: false,
         error: null,
+        user: null,
     },
     reducers: {
         resetAuthState: (state) => {
             state.isAuthenticated = false;
+            state.user = null;
         },
     },
     extraReducers: (builder) => {
         builder
+            .addCase(fetchUser.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(fetchUser.fulfilled, (state, action) => {
+                state.loading = false;
+                state.isAuthenticated = true;
+                state.user = action.payload;
+            })
+            .addCase(fetchUser.rejected, (state, action) => {
+                state.loading = false;
+                state.isAuthenticated = false;
+                state.user = null;
+            })
             .addCase(refreshToken.pending, (state) => {
                 state.loading = true;
             })
