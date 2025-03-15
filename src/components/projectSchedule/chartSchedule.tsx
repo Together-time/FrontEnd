@@ -5,7 +5,7 @@ import styles from "./chartSchedule.module.css";
 import axios from "axios";
 import { useAppDispatch, useAppSelector } from '@/app/store/store';
 import { RootState } from "@/app/store/store";
-import { fetchProjectSchedules } from "@/app/store/scheduleSlice";
+import { fetchSaveSchedule, fetchProjectSchedules } from "@/app/store/scheduleSlice";
 
 
 interface Task {
@@ -56,21 +56,21 @@ const ChartSchedule: React.FC = () => {
     //데이터 형식 변환
     useEffect(() => {
         if (schedules.length > 0) {
+            console.log("📌 Redux 일정 데이터 업데이트됨:", schedules);
+    
             const convertedTasks: Task[] = schedules.map((schedule): Task => {
-                // ✅ 날짜 변환: "YYYY-MM-DD" 형식 문자열로 변환
                 const formatDate = (date: string | number[]): string => {
                     if (Array.isArray(date)) {
                         return date.map(num => num.toString().padStart(2, "0")).join("-"); 
                     }
-                    return date; // 이미 문자열이면 그대로 반환
+                    return date;
                 };
     
-                // ✅ 시간 변환: '분' 단위 숫자로 변환
                 const formatTime = (time: number[] | string): string => {
                     if (Array.isArray(time)) {
                         return time.map(num => num.toString().padStart(2, "0")).join(":"); 
                     }
-                    return ""; // 잘못된 값이면 기본값 0
+                    return time || "00:00"; // ✅ 기본값 추가
                 };
     
                 return {
@@ -87,7 +87,8 @@ const ChartSchedule: React.FC = () => {
     
             setTasks(convertedTasks);
         }
-    }, [schedules]);
+    }, [schedules]); // ✅ Redux `schedules`가 변경될 때만 실행
+    
     
     
 
@@ -110,11 +111,15 @@ const ChartSchedule: React.FC = () => {
             .catch((error) => console.error("색상 데이터 로드 실패:", error));
     }, []);
 
-    // 일정 저장 로직 (백엔드 POST 요청)
-    const handleSaveSchedule = async () => {
-        const token = localStorage.getItem("jwtToken");
 
-        // 데이터 확인 (필수 입력값)
+    // 일정 저장 이벤트
+    const handleSaveSchedule = async () => {
+        if (!projectId || isNaN(Number(projectId))) {
+            alert("🚨 프로젝트 정보가 없습니다. 다시 시도해주세요.");
+            console.error("프로젝트 ID가 undefined 또는 올바르지 않음:", projectId);
+            return;
+        }
+
         if (!schedule || !selectedDate || !selectedStartTime || !selectedEndTime){
             alert("일정을 입력하고 시작/종료 시간을 선택해주세요.");
             return;
@@ -131,32 +136,24 @@ const ChartSchedule: React.FC = () => {
         };
 
         try {
-            const response = await axios.post( 
-                `${process.env.NEXT_PUBLIC_API_URL}/api/schedule/${projectId}`,
-                scheduleData,
-                {
-                    withCredentials: true 
-                }
-            );
+            await dispatch(fetchSaveSchedule({ projectId, scheduleData })).unwrap();
 
-            if (response.status === 200 && response.data){
-                alert("일정이 저장되었습니다!");
-                setIsPopupOpen(false); 
-                setSchedule("");
-                setMemo("");
-                setSelectedStartTime("");
-                setSelectedEndTime("");
+            dispatch(fetchProjectSchedules(projectId));
 
-                //일정 저장 후 업데이트
-                setUpdateTrigger((prev) => !prev);
-            } else {
-                throw new Error("일정 저장 실패");
-            }
-        } catch(error){
-            console.error("일정 저장 중 오류 발생: ", error);
+            alert("일정이 저장되었습니다!");
+            setIsPopupOpen(false);
+            setSchedule("");
+            setMemo("");
+            setSelectedStartTime("");
+            setSelectedEndTime("");
+
+        } catch(error) {
+            console.error("❌ 일정 저장 오류:", error);
             alert("일정 저장 중 문제가 발생했습니다.");
         }
     };
+
+
 
       // ⏰ 시간 변환 함수 (HH:mm → % 변환)
     const timeToMinutes = (time: string) => {
