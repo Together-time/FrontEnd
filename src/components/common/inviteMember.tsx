@@ -1,98 +1,79 @@
 import React, {useState, useEffect} from "react";
 import axios from "axios";
 import styles from './inviteMember.module.css';
-import { RootState } from "@/app/store/store";
-import { useAppSelector } from '@/app/store/store';
+import { RootState, useAppDispatch, useAppSelector } from '@/app/store/store';
+import { fetchMembers, inviteMember } from "@/app/store/teamSlice";
 
 interface PopupProps {
     isOpen: boolean;
     onClose: () => void;
 }  
 
-// ✅ Member 타입을 명시
 type Member = {
-    id: string;
+    id: number;
     nickname: string;
-    email: string;
+    email?:string;
 };  
 
 const InvitePopup: React.FC<PopupProps> = ({ isOpen, onClose }) => {
     if (!isOpen) return null;
     const [name, setName] = useState("");
+    const dispatch = useAppDispatch();
     //사용자 검색
     const [keyword, setKeyword] = useState("");
     const [searchResults, setSearchResults] = useState<Member[]>([]);
-    const [loading, setLoading] = useState(false);
-    const [selectedMember, setSelectedMember] = useState<{ nickname: string; email: string } | null>(null);
+    const [selectedMember, setSelectedMember] = useState<Member | null>(null);
     const [isInviting, setIsInviting] = useState(false);
     const selectedProject = useAppSelector((state:RootState) => state.selectedProject.selectedProject);
+    const { searchedMembers, loading } = useAppSelector((state: RootState) => state.team);
+
 
     //실시간 검색 요청
-    const fetchMembers = async () => {
-        if(keyword.trim() === "") {
-            setSearchResults([]);
-            return;
-        }
-
-        setLoading(true);
-      
-        try {
-          const response = await axios.get(
-            `${process.env.NEXT_PUBLIC_API_URL}/api/member`,
-            {
-              params: { keyword },
-              withCredentials: true,
-            }
-          );
-      
-          setSearchResults(response.data);
-        } catch (error) {
-          console.error("멤버 검색 오류:", error);
-        } finally {
-          setLoading(false);
-        }
-    };
-
     useEffect(() => {
-        fetchMembers();
-    }, [keyword]);
+        if (keyword.trim() !== "") {
+            dispatch(fetchMembers(keyword));
+        }
+    }, [keyword, dispatch]);
       
 
     const handleSelectMember = (member:any) => {
         setKeyword(`${member.nickname} (${member.email})`);
-        setSelectedMember(member);
+        setSelectedMember({
+            id: member.id,
+            nickname: member.nickname,
+            email: member.email,
+        });
         setSearchResults([]);
       };
 
     //팀원 초대 요청
     const handleInviteMember = async () => {
-        if (!selectedMember) return;
-    
+        if (!selectedMember || !selectedMember.id) {
+            alert("초대할 사용자의 정보가 올바르지 않습니다.");
+            return;
+        }
+
+        if (!selectedProject?.id) {
+            alert("선택된 프로젝트 정보가 없습니다.");
+            return;
+        }
+
         setIsInviting(true);
-    
+
         try {
-            const projectId = Number(selectedProject?.id);
-    
-            const response = await axios.post(
-                `${process.env.NEXT_PUBLIC_API_URL}/api/team`,
-                {
+            await dispatch(
+                inviteMember({
                     member: selectedMember, 
-                    projectId: projectId
-                },
-                {
-                    withCredentials: true
-                }
-            );
-    
-            if (response.status === 200) {
-                alert(`${selectedMember.nickname}님이 초대되었습니다!`);
-                setSelectedMember(null);
-                setKeyword("");
-            } else {
-                alert("초대에 실패했습니다.");
-            }
-        } catch(error) {
-            console.error("팀원 초대 오류: ", error);
+                    projectId: Number(selectedProject.id),
+                })
+            ).unwrap();
+
+            alert(`${selectedMember.nickname}님이 초대되었습니다!`);
+            setSelectedMember(null);
+            setKeyword("");
+        } catch (error) {
+            console.error("팀원 초대 오류:", error);
+            alert("초대에 실패했습니다.");
         } finally {
             setIsInviting(false);
         }
