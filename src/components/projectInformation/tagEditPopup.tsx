@@ -3,6 +3,7 @@ import styles from './tagEditPopup.module.css';
 import axios from "axios";
 import { useAppDispatch, useAppSelector } from '@/app/store/store';
 import { fetchProjectById } from '@/app/store/selectedProjectSlice';
+import { fetchUpdateProjectTags } from "@/app/store/selectedProjectSlice";
 import { RootState } from "@/app/store/store";
 
 interface PopupProps {
@@ -24,9 +25,11 @@ const TagEditPopup: React.FC<PopupProps> = ({ isOpen, onClose }) => {
     // 태그 리스트 상태 (Redux에서 가져온 데이터를 useState로 관리)
     const [tags, setTags] = useState<string[]>([]);
 
-        useEffect(() => {
-        if (selectedProject?.tags) {
-            setTags([...selectedProject.tags]); // Redux 데이터를 복사하여 상태 관리
+    useEffect(() => {
+        if (Array.isArray(selectedProject?.tags)) {  
+            setTags([...selectedProject.tags]); 
+        } else {
+            setTags([]); 
         }
     }, [selectedProject]);
 
@@ -53,32 +56,19 @@ const TagEditPopup: React.FC<PopupProps> = ({ isOpen, onClose }) => {
     const handleSaveTags = async () => {
         if (!selectedProject) return;
     
-        const token = localStorage.getItem('jwtToken');
-    
         try {
-            const response = await axios.put(
-                `${process.env.NEXT_PUBLIC_API_URL}/api/projects/${selectedProject.id}/tag`,
-                tags ,
-                {
-                    withCredentials: true 
-                }
-            );
+            await dispatch(fetchUpdateProjectTags({ projectId: selectedProject.id, tags })).unwrap();
     
-            if (response.status === 200) {
-                alert("태그가 성공적으로 수정되었습니다!");
-                //프로젝트 데이터 재발행
-                dispatch(fetchProjectById(selectedProject.id));
-                onClose();
-            } else {
-                alert("태그 수정에 실패했습니다.");
-            }
+            // 프로젝트 데이터 재발행
+            await dispatch(fetchProjectById(selectedProject.id)).unwrap();
+    
+            alert("태그가 성공적으로 수정되었습니다!");
+            onClose();
         } catch (error) {
             console.error("태그 수정 오류:", error);
-            alert("서버 오류가 발생했습니다.");
+            alert("태그 수정에 실패했습니다.");
         }
     };
-    
-    
     
     
 
