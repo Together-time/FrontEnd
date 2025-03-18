@@ -34,16 +34,15 @@ const ProjectList: React.FC = () => {
   }, [dispatch]);
 
   if (status === "loading") return <p>Loading...</p>;
-  if (error) return <p>Error: {JSON.stringify(error)}</p>; // 객체를 문자열로 변환하여 출력
+  if (error) return <p>Error: {JSON.stringify(error)}</p>;
 
   //프로젝트 선택
   const handleProjectClick = (project: Project) => {
     dispatch(setSelectedProject(project));
     dispatch(fetchProjectMembers(project.id));
     //채팅 슬라이스에 projectId 전달
-    dispatch(fetchMessages({ projectId: project.id })); // ✅ 채팅 메시지 로드
+    dispatch(fetchMessages({ projectId: project.id })); 
     dispatch(fetchUnreadCount({ projectId: project.id }));
-    console.log('프로젝트 상세 정보:', project);
   };
 
   return (

@@ -6,9 +6,12 @@ import teamReducer from './teamSlice';
 import scheduleReducer from './scheduleSlice';
 import chatReducer from './chatSlice';
 import searchReducer from './searchSlice';
+import authReducer from './authSlice';
+import api from "../utils/api";
 
 export const store = configureStore({
     reducer: {
+        auth: authReducer,
         project: projectReducer,
         selectedProject: selectedProjectReducer,
         team: teamReducer,
@@ -16,6 +19,10 @@ export const store = configureStore({
         chat: chatReducer,
         search: searchReducer,
     },
+    middleware: (getDefaultMiddleware) => 
+        getDefaultMiddleware({
+            serializableCheck: false,
+        }),
 });
 
 export type RootState = ReturnType<typeof store.getState>;

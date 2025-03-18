@@ -1,0 +1,170 @@
+/* 팝업 배경 */
+.popupOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* 팝업 컨테이너 */
+.popupContainer {
+    position: relative;
+    width: 650px;
+    height: 70vh;
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    text-align: center;
+}
+
+/* 닫기 버튼 */
+.closeButton {
+    position: absolute;
+    top: 30px;
+    right: 30px;
+    font-size: 20px;
+    cursor: pointer;
+    background: none;
+    border: none;
+}
+
+/* 시계형 컨테이너 */
+.popupClockContainer {
+    position: relative;
+    width: 45vh;
+    height: 45vh;
+    aspect-ratio: 1 / 1;
+    margin: 0 auto;
+    border: 2px solid rgb(85, 38, 0);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgb(248, 247, 245);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+/*프로젝트 제목*/
+.popupTitle{
+    font-size: 30px;
+    margin-top: 30px;
+    margin-bottom: 50px;
+}
+
+/* 시계 숫자 */
+.popupHour {
+    position: absolute;
+    top: 33%;
+    transform-origin: center;
+    transform: rotate(calc(var(--index) * 30deg)) translate(0, -120%);
+    width: auto;
+    height: 15vh;
+    font-size: 18px;
+    font-weight: bold;
+    color: rgb(85, 38, 0);
+}
+
+/* 일정 아크 */
+.popupScheduleArc {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: conic-gradient(
+        var(--color) 0deg, 
+        var(--color) var(--duration-angle),
+        transparent var(--duration-angle)
+    );
+    transform: rotate(calc(var(--start-angle) - 0deg));
+    mix-blend-mode: multiply; 
+    opacity: 0.85;
+}
+
+/* 일정 제목 */
+.popupScheduleTextContainer {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    transform: rotate(calc(var(--text-angle) - 90deg)) translate(var(--radius)) rotate(calc(-1 * var(--text-angle) + 90deg));
+    transform-origin: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.popupScheduleTitle {
+    font-size: 16px;
+    color: white;
+    text-align: center;
+}
+
+/* AM/PM 버튼 */
+.popupButton {
+    position: absolute; 
+    top: -30px; 
+    right: -80px; 
+    width: 90px; 
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border: 2px solid #333;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+/* ✅ AM 상태 */
+.popupAmBg {
+    background-color: rgb(251, 189, 76);
+    border: 2px solid rgb(251, 189, 76);
+}
+
+/* ✅ PM 상태 */
+.popupPmBg {
+    background-color: rgb(42, 30, 151);
+    border: 2px solid rgb(42, 30, 151);
+}
+
+
+/* 🔹 AM/PM 텍스트 */
+.popupButton span {
+    font-size: 12px;
+    font-weight: bold;
+    color: #333;
+    z-index: 1;
+    padding: 8px;
+    user-select: none;
+}
+
+/* 🔹 내부 슬라이딩 버튼 */
+.popupSlider {
+    width: 44px;
+    height: 36px;
+    background-color: white;
+    border-radius: 50%;
+    position: absolute;
+    transition: transform 0.3s ease-in-out;
+    border: 1px solid #333;
+}
+
+/* ✅ AM 상태 - 왼쪽 */
+.popupAm {
+    transform: translateX(2px);
+    background-color: rgb(232, 216, 202);
+    border: 1px solid rgb(251, 189, 76);
+}
+
+/* ✅ PM 상태 - 오른쪽 */
+.popupPm {
+    transform: translateX(40px);
+    background-color: rgb(202, 204, 232);
+    border: 1px solid rgb(42, 30, 151);
+}
+

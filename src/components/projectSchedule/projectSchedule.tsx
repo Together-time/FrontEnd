@@ -9,8 +9,10 @@ import { FiSearch } from "react-icons/fi";
 import { SlOptions } from "react-icons/sl";
 import { RootState } from "@/app/store/store";
 import { useAppDispatch, useAppSelector } from '@/app/store/store';
-import axios from "axios";
+import { fetchToggleProjectVisibility } from "@/app/store/selectedProjectSlice";
 import { fetchProjectById } from '@/app/store/selectedProjectSlice';
+import { fetchDeleteProject } from "@/app/store/projectSlice";
+import { fetchLeaveTeam } from "@/app/store/teamSlice";
 
 const ProjectSchedule: React.FC = () => {
     const router = useRouter();
@@ -27,6 +29,7 @@ const ProjectSchedule: React.FC = () => {
     //특정 프로젝트 데이터 불러오기
     const selectedProject = useAppSelector((state:RootState) => state.selectedProject.selectedProject);
     const [isPublic, setIsPublic] = useState(selectedProject?.status === "PUBLIC");
+    const projectId = selectedProject?.id; 
 
     useEffect(() => {
       if (selectedProject) {
@@ -181,32 +184,49 @@ const ProjectSchedule: React.FC = () => {
     // 토글 버튼 클릭 시 상태 변경
     const toggleVisibility = async () => {
       try {
-        const token = localStorage.getItem("jwtToken"); 
         const projectId = selectedProject?.id;
 
         if (!projectId) return;
 
-        // 서버에 PATCH 요청 보내기 (공개 여부 변경)
-        const response = await axios.patch(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/projects/${selectedProject.id}/visibility`,
-          {},
-          {
-            withCredentials: true,
-          }
-        );
+        // Redux로 공개 여부 토글 요청
+        await dispatch(fetchToggleProjectVisibility(projectId)).unwrap();
 
-        if (response.status === 200) {
-          setIsPublic((prev) => !prev);
-          dispatch(fetchProjectById(projectId));
-        }
+        // 변경된 프로젝트 데이터 다시 불러오기
+        dispatch(fetchProjectById(projectId));
       } catch (error) {
         console.error("프로젝트 공개 설정 변경 오류:", error);
       }
     };
 
+
     //검색 페이지로 이동
     const handleSearch = () => {
       router.push("/search");
+    };
+
+    //프로젝트 나가기
+    const handleExitProject = () => {
+      if (projectId === undefined) {
+        console.error("프로젝트 ID가 존재하지 않습니다.");
+        return;
+      }
+
+      if(window.confirm("정말로 나가시겠습니까?")) {
+        dispatch(fetchLeaveTeam(projectId));
+        window.location.reload();
+      }
+    };
+
+    //프로젝트 삭제
+    const handleDeleteProject = () => {
+      if (projectId === undefined) {
+        console.error("프로젝트 ID가 존재하지 않습니다.");
+        return;
+      }
+
+      if(window.confirm("정말로 삭제하시겠습니까?")){
+        dispatch(fetchDeleteProject(projectId));
+      }
     };
 
 
@@ -242,12 +262,21 @@ const ProjectSchedule: React.FC = () => {
           {/* 설정창 */}
           {isOpen && (
             <div className={styles.optionPage}>
-              <h2>프로젝트 공개</h2>
-              <div 
-                className={`${styles.toggleSwitch} ${isPublic ? styles.on : styles.off}`} 
-                onClick={toggleVisibility}
-              >
-                <div className={styles.toggleBall}></div>
+              {/* 프로젝트 공개 여부 */}
+              <div className={styles.publicOption}>
+                <h2>프로젝트 공개</h2>
+                <div 
+                  className={`${styles.toggleSwitch} ${isPublic ? styles.on : styles.off}`} 
+                  onClick={toggleVisibility}
+                >
+                  <div className={styles.toggleBall}></div>
+                </div>
+              </div>
+
+              {/* 프로젝트 나가기 및 삭제 */}
+              <div className={styles.memberOptions}>
+                <button className={styles.exitProject} onClick={handleExitProject}>프로젝트 나가기</button>
+                <button className={styles.deleteProject} onClick={handleDeleteProject}>프로젝트 삭제</button>
               </div>
             </div>
           )}

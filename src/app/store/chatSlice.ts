@@ -19,7 +19,6 @@ export const fetchMessages = createAsyncThunk(
             withCredentials: true, 
         });
 
-        console.log("📩 가져온 메시지:", response.data);
         return response.data;
     }
 );
@@ -35,12 +34,12 @@ export const fetchUnreadCount = createAsyncThunk(
             withCredentials: true, 
         });
 
-        console.log("📩 안 읽은 메시지:", response.data);
         return response.data;
     }
 );
 
-interface ChatMessage {
+export interface ChatMessage {
+    id: string;
     content: string;
     createdAt: string;
     sender: { id: number; name: string };
@@ -69,25 +68,48 @@ const chatSlice = createSlice({
         addMessage: (state, action: PayloadAction<ChatMessage>) => {
             state.messages.push(action.payload);
         },
+        updateUnreadCount: (state, action: PayloadAction<{ messageId: string; unreadCount: number }>) => {
+            const { messageId, unreadCount } = action.payload;
+
+            state.messages = state.messages.map((msg) =>
+                msg.id === messageId ? { ...msg, unreadCount } : msg
+            );
+
+            state.unreadCount = state.messages.reduce((sum, msg) => sum + msg.unreadCount, 0);
+            
+            console.log(`📌 Redux 상태 업데이트됨: messageId=${messageId}, unreadCount=${unreadCount}`);
+        },
+        resetMessages: (state) => { 
+            state.messages = [];
+            state.unreadCount = 0;
+        },
     },
     extraReducers: (builder) => {
         builder
+            // 메시지 불러오는 로직
             .addCase(fetchMessages.pending, (state) => {
                 state.status = "loading";
             })
             .addCase(fetchMessages.fulfilled, (state, action) => {
                 state.status = "idle";
-                state.messages = action.payload;
+                state.messages = action.payload.messages;
+
+                // 만약 메시지 응답에 unreadCount가 포함되어 있으면 같이 저장
+                if (action.payload.unreadCount !== undefined) {
+                    state.unreadCount = action.payload.unreadCount;
+                }
             })
             .addCase(fetchMessages.rejected, (state, action) => {
                 state.status = "failed";
                 state.error = action.error.message || "메시지를 불러오는데 실패했습니다.";
             })
+            // 안 읽은 메시지 개수 업데이트 로직
             .addCase(fetchUnreadCount.fulfilled, (state, action) => {
+                console.log("📩 Redux 상태 업데이트: unreadCount =", action.payload);
                 state.unreadCount = action.payload;
             });
     },
 });
 
-export const { addMessage } = chatSlice.actions;
+export const { addMessage, updateUnreadCount, resetMessages } = chatSlice.actions;
 export default chatSlice.reducer;

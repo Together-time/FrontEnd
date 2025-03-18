@@ -8,11 +8,13 @@ export interface Project {
   title: string; 
   views: number;
   members?: Member[];
+  isPublic: boolean;
 }
 
 interface Member {
   id: number;
   nickname: string;
+  email?: string;
 }
 
 
@@ -46,7 +48,49 @@ export const fetchProjects = createAsyncThunk<Project[], void, { rejectValue: st
       }
     }
   );
-  
+
+//프로젝트 생성
+export const fetchCreateProject = createAsyncThunk<
+  Project,
+  { title: string; tags: string[]; members?: Member[] }, 
+  { rejectValue: string }
+>(
+  'project/fetchCreateProject',
+  async ({ title, tags, members = [] }, thunkAPI) => { 
+    try {
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/projects`,
+        { title, tags, members }, 
+        { withCredentials: true }
+      );
+      return response.data;
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue(error.response?.data || '프로젝트 생성 실패');
+    }
+  }
+);
+
+
+//프로젝트 삭제
+export const fetchDeleteProject = createAsyncThunk<
+  number,
+  number,
+  {rejectValue: string}
+>(
+  "project/fetchDeleteProject",
+  async (projectId, thunkAPI) => {
+    try {
+      await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/api/projects/${projectId}`, {
+        withCredentials: true,
+      });
+
+      console.log("프로젝트 삭제:", projectId);
+      return projectId;
+    } catch(error: any){
+      return thunkAPI.rejectWithValue(error.response?.data);
+    }
+  }
+);
 
 const projectSlice = createSlice({
     name: 'project',
@@ -64,7 +108,19 @@ const projectSlice = createSlice({
         })
         .addCase(fetchProjects.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload || 'Something went wrong';
+        state.error = action.payload || '정보 불러오기 실패패';
+        })
+        .addCase(fetchCreateProject.fulfilled, (state, action: PayloadAction<Project>) => {
+          state.projects.push(action.payload);
+        })
+        .addCase(fetchCreateProject.rejected, (state, action) => {
+          state.error = action.payload || "프로젝트 생성 실패";
+        })
+        .addCase(fetchDeleteProject.fulfilled, (state, action) => {
+          state.projects = state.projects.filter(project => project.id !== action.payload);
+        })
+        .addCase(fetchDeleteProject.rejected, (state, action) => {
+          state.error = action.payload || "프로젝트 삭제 실패";
         });
     },
 });

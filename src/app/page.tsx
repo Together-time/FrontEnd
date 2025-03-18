@@ -8,14 +8,17 @@ import Schedule from "@/components/projectSchedule/projectSchedule";
 import KakaoLogin from "./images/kakaoLogin.png";
 import Image from "next/image";
 import axios from "axios";
+import { useAppDispatch, useAppSelector } from "@/app/store/store";
+import { fetchUser, logout } from "@/app/store/authSlice";
 import "@/app/page.css";
 
 const Home: React.FC = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // 로그인 상태
-  const [isCheckingLogin, setIsCheckingLogin] = useState(true); // 로그인 상태 확인 중 여부
+  const [isLoggedIn, setIsLoggedIn] = useState(false); 
+  const [isCheckingLogin, setIsCheckingLogin] = useState(true);
   //사용자 정보
-  const [user, setUser] = useState<{ nickname: string; email: string; online: boolean } | null>(null);
+  const { isAuthenticated, loading, user } = useAppSelector((state) => state.auth);
   const router = useRouter();
+  const dispatch = useAppDispatch();
 
   // 카카오 로그인 URL 생성
   const KAKAO_AUTH_URL = `${process.env.NEXT_PUBLIC_API_URL}/oauth2/authorization/kakao`;
@@ -23,56 +26,49 @@ const Home: React.FC = () => {
 
   // 로그인 상태 확인
   useEffect(() => {
-    const loginAttempted = sessionStorage.getItem("loginAttempted");
-  
-    if (loginAttempted === "true") {
-      axios
-        .get(`${process.env.NEXT_PUBLIC_API_URL}/api/member/user`, {
-          withCredentials: true,
-        })
-        .then((response) => {
-          console.log("📌 API 응답 데이터:", response.data);
-  
-          if (response.data && typeof response.data === "object") {
-            const userInfo = {
-              nickname: response.data.nickname || "알 수 없음",
-              email: response.data.email || "unknown@example.com",
-            };
-
-            console.log("✅ 저장할 사용자 정보:", userInfo);
-
-            // ✅ localStorage에 저장
-            localStorage.setItem("userInfo", JSON.stringify(userInfo));
-
-            console.log("✅ localStorage에 저장된 사용자 정보:", localStorage.getItem("userInfo"));
-  
-          } else {
-            console.warn("⚠ 예상치 못한 응답 형식:", response.data);
-          }
-    
-          setIsLoggedIn(true);
-        })
-        .catch((error) => {
-          console.error("❌ 사용자 정보 요청 실패:", error.response?.data || error.message);
-          setIsLoggedIn(false);
-        })
-        .finally(() => {
-          sessionStorage.removeItem("loginAttempted");
-          setIsCheckingLogin(false);
-        });
-    } else {
-      sessionStorage.removeItem("loginAttempted");
-      setIsLoggedIn(false);
-      setIsCheckingLogin(false);
+    if (!sessionStorage.getItem("sessionInitialized")) {
+      console.log("🗑 프로젝트 실행 - 로그인 정보 초기화");
+      sessionStorage.setItem("sessionInitialized", "true");
+      localStorage.removeItem("userInfo");
     }
-  }, []);
+
+    dispatch(fetchUser())
+      .unwrap()
+      .then((userData) => {
+        if (userData) {
+          setIsLoggedIn(true);
+        } else {
+          setIsLoggedIn(false);
+        }
+      })
+      .catch(() => {
+        setIsLoggedIn(false);
+      })
+      .finally(() => {
+        setIsCheckingLogin(false);
+      });
+  }, [dispatch]);
   
 
+  // 로그아웃 기능 추가
+  const handleLogout = async () => {
+    try {
+      const result = await dispatch(logout()).unwrap(); 
+      if (result === true) { 
+        localStorage.removeItem("userInfo");
+        setIsLoggedIn(false);
+      } else {
+        console.warn("⚠ 로그아웃 실패: 예상치 못한 응답 값", result);
+      }
+    } catch (error) {
+      console.error("❌ 로그아웃 요청 실패:", error);
+    }
+  };
 
   // 카카오 로그인 핸들러
   const handleKakaoLogin = () => {
     console.log("카카오 로그인 시도...");
-    sessionStorage.setItem("loginAttempted", "true"); // 로그인 시도 상태 저장
+    sessionStorage.setItem("loginAttempted", "true");
     window.location.href = KAKAO_AUTH_URL; 
   };
 
@@ -98,7 +94,7 @@ const Home: React.FC = () => {
             <ProjectList />
           </div>
           <div className="middle">
-            <ProjectInformation />
+            <ProjectInformation handleLogout={handleLogout}/>
           </div>
           <div className="right">
             <Schedule />

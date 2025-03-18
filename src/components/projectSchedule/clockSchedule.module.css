@@ -151,8 +151,6 @@
     z-index: 0;
 }
 
-
-/* ✅ 텍스트가 일정의 중앙에 배치되도록 설정 */
 .scheduleTextContainer {
     position: absolute;
     width: 100%;
@@ -197,12 +195,11 @@
     overflow-y: auto;
 }
 
-/* 패널이 열릴 때 적용되는 클래스 */
 .textPanel.open {
     right: 0;
 }
 
-/* 일정 항목 스타일 (가로 정렬) */
+
 .scheduleItem {
     display: flex;
     align-items: center;
@@ -219,7 +216,6 @@
     margin-top: 5vh;
 }
 
-/* 색상 점 (●) */
 .textScheduleColor {
     width: 15px;
     height: 15px;
@@ -230,12 +226,16 @@
     margin-top: 7px;
 }
 
-/* 일정 정보 컨테이너 */
 .textScheduleContent {
     flex-grow: 1; 
 }
 
-/* 옵션 버튼 (⋮) */
+.textScheduleMemo {
+    font-size: 14px;
+    color: gray;
+    margin-left: 10px;
+}
+
 .optionsButton {
     background: none;
     border: none;
